@@ -1,19 +1,14 @@
 
-
 syntax = "proto3";
 
-// The greeting service definition.
 service Asset {
-  // Sends a greeting
   rpc Request (AssetIdentifier) returns (HDF5Reply) {}
 }
 
-// The request message containing the user's name.
 message AssetIdentifier {
   string id = 1;
 }
 
-// The response message containing the greetings
 message HDF5Reply {
   string message = 1;
 }
