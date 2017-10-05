@@ -13,6 +13,7 @@ import numpy as np
 from matplotlib import pyplot as plt
 
 
+
 # USAGE EXAMPLE
 # $ python HDF5_client.py im1 im2 
 
