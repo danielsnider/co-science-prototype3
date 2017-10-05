@@ -15,19 +15,26 @@ import tables
 _ONE_DAY_IN_SECONDS = 60 * 60 * 24
 
 
-filename = glob.iglob('./images/*').next() # get first file in directory
-im = skimage.io.imread(filename)
 h5file = tables.open_file("new_sample.h5", "w", driver="H5FD_CORE",
                           driver_core_backing_store=0)
-h5file.create_array(h5file.root, "im", im)
+
+for i, filename in enumerate(glob.iglob('./images/*')):
+  im = skimage.io.imread(filename)
+  array_name = "im%s" % i # eg. im1, im2, etc.
+  h5file.create_array(h5file.root, array_name, im)
+  print('loaded image %s' % filename)
 
 class Greeter(HDF5_pb2_grpc.GreeterServicer):
 
   def SayHello(self, request, context):
-    # from IPython import embed
-    # embed() # drop into an IPython session
     # return HDF5_pb2.HelloReply(message='Hello, %s!' % request.name)
-    return HDF5_pb2.HelloReply(message=h5file.get_file_image().encode('base64'))
+    im = eval('h5file.root.%s' % request.name)
+    h5single = tables.open_file("new_im.h5", "w", driver="H5FD_CORE",
+                              driver_core_backing_store=0)
+    h5single.create_array(h5single.root, 'im', im.read())
+    data = h5single.get_file_image().encode('base64')
+    h5single.close()
+    return HDF5_pb2.HelloReply(message=data)
 
 
 def serve():
@@ -40,6 +47,7 @@ def serve():
       time.sleep(_ONE_DAY_IN_SECONDS)
   except KeyboardInterrupt:
     server.stop(0)
+    h5file.close()
 
 if __name__ == '__main__':
   serve()

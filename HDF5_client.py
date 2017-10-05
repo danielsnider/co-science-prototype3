@@ -1,5 +1,5 @@
 from __future__ import print_function
-
+import sys
 import grpc
 import HDF5_pb2
 import HDF5_pb2_grpc
@@ -10,6 +10,10 @@ import numpy as np
 
 from matplotlib import pyplot as plt
 
+
+# USAGE EXAMPLE
+# $ python HDF5_client.py im1 im2 
+
 plt.ion()
 def display_image(im):
   plt.clf()
@@ -18,10 +22,12 @@ def display_image(im):
   plt.waitforbuttonpress()
 
 
-def run():
-  channel = grpc.insecure_channel('localhost:50051')
+def run(requested_image):
+  grpc_options=[('grpc.max_send_message_length', -1),
+           ('grpc.max_receive_message_length', -1)]
+  channel = grpc.insecure_channel('localhost:50051',options=grpc_options)
   stub = HDF5_pb2_grpc.GreeterStub(channel)
-  response = stub.SayHello(HDF5_pb2.HelloRequest(name='you'))
+  response = stub.SayHello(HDF5_pb2.HelloRequest(name=requested_image))
   h5file = tables.open_file("in-memory-sample.h5", driver="H5FD_CORE",
                                 driver_core_image=response.message.decode('base64'),
                                 driver_core_backing_store=0)
@@ -30,7 +36,10 @@ def run():
   h5file.close()
 
 
-
+def display_image_loop():
+  for requested_image in sys.argv[1:]:
+    run(requested_image)
 
 if __name__ == '__main__':
-  run()
+  while True:
+    display_image_loop()

@@ -1,4 +1,4 @@
 *.tar*
 *.pyc
 *.sqlite
-images/
+#images/
