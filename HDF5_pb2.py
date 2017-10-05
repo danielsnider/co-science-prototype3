@@ -19,21 +19,21 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   name='HDF5.proto',
   package='',
   syntax='proto3',
-  serialized_pb=_b('\n\nHDF5.proto\"\x1c\n\x0cHelloRequest\x12\x0c\n\x04name\x18\x01 \x01(\t\"\x1d\n\nHelloReply\x12\x0f\n\x07message\x18\x01 \x01(\t23\n\x07Greeter\x12(\n\x08SayHello\x12\r.HelloRequest\x1a\x0b.HelloReply\"\x00\x62\x06proto3')
+  serialized_pb=_b('\n\nHDF5.proto\"\x1d\n\x0f\x41ssetIdentifier\x12\n\n\x02id\x18\x01 \x01(\t\"\x1c\n\tHDF5Reply\x12\x0f\n\x07message\x18\x01 \x01(\t22\n\x05\x41sset\x12)\n\x07Request\x12\x10.AssetIdentifier\x1a\n.HDF5Reply\"\x00\x62\x06proto3')
 )
 
 
 
 
-_HELLOREQUEST = _descriptor.Descriptor(
-  name='HelloRequest',
-  full_name='HelloRequest',
+_ASSETIDENTIFIER = _descriptor.Descriptor(
+  name='AssetIdentifier',
+  full_name='AssetIdentifier',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   fields=[
     _descriptor.FieldDescriptor(
-      name='name', full_name='HelloRequest.name', index=0,
+      name='id', full_name='AssetIdentifier.id', index=0,
       number=1, type=9, cpp_type=9, label=1,
       has_default_value=False, default_value=_b("").decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
@@ -52,19 +52,19 @@ _HELLOREQUEST = _descriptor.Descriptor(
   oneofs=[
   ],
   serialized_start=14,
-  serialized_end=42,
+  serialized_end=43,
 )
 
 
-_HELLOREPLY = _descriptor.Descriptor(
-  name='HelloReply',
-  full_name='HelloReply',
+_HDF5REPLY = _descriptor.Descriptor(
+  name='HDF5Reply',
+  full_name='HDF5Reply',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   fields=[
     _descriptor.FieldDescriptor(
-      name='message', full_name='HelloReply.message', index=0,
+      name='message', full_name='HDF5Reply.message', index=0,
       number=1, type=9, cpp_type=9, label=1,
       has_default_value=False, default_value=_b("").decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
@@ -82,52 +82,52 @@ _HELLOREPLY = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=44,
+  serialized_start=45,
   serialized_end=73,
 )
 
-DESCRIPTOR.message_types_by_name['HelloRequest'] = _HELLOREQUEST
-DESCRIPTOR.message_types_by_name['HelloReply'] = _HELLOREPLY
+DESCRIPTOR.message_types_by_name['AssetIdentifier'] = _ASSETIDENTIFIER
+DESCRIPTOR.message_types_by_name['HDF5Reply'] = _HDF5REPLY
 _sym_db.RegisterFileDescriptor(DESCRIPTOR)
 
-HelloRequest = _reflection.GeneratedProtocolMessageType('HelloRequest', (_message.Message,), dict(
-  DESCRIPTOR = _HELLOREQUEST,
+AssetIdentifier = _reflection.GeneratedProtocolMessageType('AssetIdentifier', (_message.Message,), dict(
+  DESCRIPTOR = _ASSETIDENTIFIER,
   __module__ = 'HDF5_pb2'
-  # @@protoc_insertion_point(class_scope:HelloRequest)
+  # @@protoc_insertion_point(class_scope:AssetIdentifier)
   ))
-_sym_db.RegisterMessage(HelloRequest)
+_sym_db.RegisterMessage(AssetIdentifier)
 
-HelloReply = _reflection.GeneratedProtocolMessageType('HelloReply', (_message.Message,), dict(
-  DESCRIPTOR = _HELLOREPLY,
+HDF5Reply = _reflection.GeneratedProtocolMessageType('HDF5Reply', (_message.Message,), dict(
+  DESCRIPTOR = _HDF5REPLY,
   __module__ = 'HDF5_pb2'
-  # @@protoc_insertion_point(class_scope:HelloReply)
+  # @@protoc_insertion_point(class_scope:HDF5Reply)
   ))
-_sym_db.RegisterMessage(HelloReply)
+_sym_db.RegisterMessage(HDF5Reply)
 
 
 
-_GREETER = _descriptor.ServiceDescriptor(
-  name='Greeter',
-  full_name='Greeter',
+_ASSET = _descriptor.ServiceDescriptor(
+  name='Asset',
+  full_name='Asset',
   file=DESCRIPTOR,
   index=0,
   options=None,
   serialized_start=75,
-  serialized_end=126,
+  serialized_end=125,
   methods=[
   _descriptor.MethodDescriptor(
-    name='SayHello',
-    full_name='Greeter.SayHello',
+    name='Request',
+    full_name='Asset.Request',
     index=0,
     containing_service=None,
-    input_type=_HELLOREQUEST,
-    output_type=_HELLOREPLY,
+    input_type=_ASSETIDENTIFIER,
+    output_type=_HDF5REPLY,
     options=None,
   ),
 ])
-_sym_db.RegisterServiceDescriptor(_GREETER)
+_sym_db.RegisterServiceDescriptor(_ASSET)
 
-DESCRIPTOR.services_by_name['Greeter'] = _GREETER
+DESCRIPTOR.services_by_name['Asset'] = _ASSET
 
 try:
   # THESE ELEMENTS WILL BE DEPRECATED.
@@ -139,7 +139,7 @@ try:
   from grpc.framework.interfaces.face import utilities as face_utilities
 
 
-  class GreeterStub(object):
+  class AssetStub(object):
     """The greeting service definition.
     """
 
@@ -149,18 +149,18 @@ try:
       Args:
         channel: A grpc.Channel.
       """
-      self.SayHello = channel.unary_unary(
-          '/Greeter/SayHello',
-          request_serializer=HelloRequest.SerializeToString,
-          response_deserializer=HelloReply.FromString,
+      self.Request = channel.unary_unary(
+          '/Asset/Request',
+          request_serializer=AssetIdentifier.SerializeToString,
+          response_deserializer=HDF5Reply.FromString,
           )
 
 
-  class GreeterServicer(object):
+  class AssetServicer(object):
     """The greeting service definition.
     """
 
-    def SayHello(self, request, context):
+    def Request(self, request, context):
       """Sends a greeting
       """
       context.set_code(grpc.StatusCode.UNIMPLEMENTED)
@@ -168,20 +168,20 @@ try:
       raise NotImplementedError('Method not implemented!')
 
 
-  def add_GreeterServicer_to_server(servicer, server):
+  def add_AssetServicer_to_server(servicer, server):
     rpc_method_handlers = {
-        'SayHello': grpc.unary_unary_rpc_method_handler(
-            servicer.SayHello,
-            request_deserializer=HelloRequest.FromString,
-            response_serializer=HelloReply.SerializeToString,
+        'Request': grpc.unary_unary_rpc_method_handler(
+            servicer.Request,
+            request_deserializer=AssetIdentifier.FromString,
+            response_serializer=HDF5Reply.SerializeToString,
         ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
-        'Greeter', rpc_method_handlers)
+        'Asset', rpc_method_handlers)
     server.add_generic_rpc_handlers((generic_handler,))
 
 
-  class BetaGreeterServicer(object):
+  class BetaAssetServicer(object):
     """The Beta API is deprecated for 0.15.0 and later.
 
     It is recommended to use the GA API (classes and functions in this
@@ -189,13 +189,13 @@ try:
     only to ease transition from grpcio<0.15.0 to grpcio>=0.15.0."""
     """The greeting service definition.
     """
-    def SayHello(self, request, context):
+    def Request(self, request, context):
       """Sends a greeting
       """
       context.code(beta_interfaces.StatusCode.UNIMPLEMENTED)
 
 
-  class BetaGreeterStub(object):
+  class BetaAssetStub(object):
     """The Beta API is deprecated for 0.15.0 and later.
 
     It is recommended to use the GA API (classes and functions in this
@@ -203,49 +203,49 @@ try:
     only to ease transition from grpcio<0.15.0 to grpcio>=0.15.0."""
     """The greeting service definition.
     """
-    def SayHello(self, request, timeout, metadata=None, with_call=False, protocol_options=None):
+    def Request(self, request, timeout, metadata=None, with_call=False, protocol_options=None):
       """Sends a greeting
       """
       raise NotImplementedError()
-    SayHello.future = None
+    Request.future = None
 
 
-  def beta_create_Greeter_server(servicer, pool=None, pool_size=None, default_timeout=None, maximum_timeout=None):
+  def beta_create_Asset_server(servicer, pool=None, pool_size=None, default_timeout=None, maximum_timeout=None):
     """The Beta API is deprecated for 0.15.0 and later.
 
     It is recommended to use the GA API (classes and functions in this
     file not marked beta) for all further purposes. This function was
     generated only to ease transition from grpcio<0.15.0 to grpcio>=0.15.0"""
     request_deserializers = {
-      ('Greeter', 'SayHello'): HelloRequest.FromString,
+      ('Asset', 'Request'): AssetIdentifier.FromString,
     }
     response_serializers = {
-      ('Greeter', 'SayHello'): HelloReply.SerializeToString,
+      ('Asset', 'Request'): HDF5Reply.SerializeToString,
     }
     method_implementations = {
-      ('Greeter', 'SayHello'): face_utilities.unary_unary_inline(servicer.SayHello),
+      ('Asset', 'Request'): face_utilities.unary_unary_inline(servicer.Request),
     }
     server_options = beta_implementations.server_options(request_deserializers=request_deserializers, response_serializers=response_serializers, thread_pool=pool, thread_pool_size=pool_size, default_timeout=default_timeout, maximum_timeout=maximum_timeout)
     return beta_implementations.server(method_implementations, options=server_options)
 
 
-  def beta_create_Greeter_stub(channel, host=None, metadata_transformer=None, pool=None, pool_size=None):
+  def beta_create_Asset_stub(channel, host=None, metadata_transformer=None, pool=None, pool_size=None):
     """The Beta API is deprecated for 0.15.0 and later.
 
     It is recommended to use the GA API (classes and functions in this
     file not marked beta) for all further purposes. This function was
     generated only to ease transition from grpcio<0.15.0 to grpcio>=0.15.0"""
     request_serializers = {
-      ('Greeter', 'SayHello'): HelloRequest.SerializeToString,
+      ('Asset', 'Request'): AssetIdentifier.SerializeToString,
     }
     response_deserializers = {
-      ('Greeter', 'SayHello'): HelloReply.FromString,
+      ('Asset', 'Request'): HDF5Reply.FromString,
     }
     cardinalities = {
-      'SayHello': cardinality.Cardinality.UNARY_UNARY,
+      'Request': cardinality.Cardinality.UNARY_UNARY,
     }
     stub_options = beta_implementations.stub_options(host=host, metadata_transformer=metadata_transformer, request_serializers=request_serializers, response_deserializers=response_deserializers, thread_pool=pool, thread_pool_size=pool_size)
-    return beta_implementations.dynamic_stub(channel, 'Greeter', cardinalities, options=stub_options)
+    return beta_implementations.dynamic_stub(channel, 'Asset', cardinalities, options=stub_options)
 except ImportError:
   pass
 # @@protoc_insertion_point(module_scope)

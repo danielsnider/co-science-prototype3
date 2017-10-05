@@ -4,7 +4,7 @@ import grpc
 import HDF5_pb2 as HDF5__pb2
 
 
-class GreeterStub(object):
+class AssetStub(object):
   """The greeting service definition.
   """
 
@@ -14,18 +14,18 @@ class GreeterStub(object):
     Args:
       channel: A grpc.Channel.
     """
-    self.SayHello = channel.unary_unary(
-        '/Greeter/SayHello',
-        request_serializer=HDF5__pb2.HelloRequest.SerializeToString,
-        response_deserializer=HDF5__pb2.HelloReply.FromString,
+    self.Request = channel.unary_unary(
+        '/Asset/Request',
+        request_serializer=HDF5__pb2.AssetIdentifier.SerializeToString,
+        response_deserializer=HDF5__pb2.HDF5Reply.FromString,
         )
 
 
-class GreeterServicer(object):
+class AssetServicer(object):
   """The greeting service definition.
   """
 
-  def SayHello(self, request, context):
+  def Request(self, request, context):
     """Sends a greeting
     """
     context.set_code(grpc.StatusCode.UNIMPLEMENTED)
@@ -33,14 +33,14 @@ class GreeterServicer(object):
     raise NotImplementedError('Method not implemented!')
 
 
-def add_GreeterServicer_to_server(servicer, server):
+def add_AssetServicer_to_server(servicer, server):
   rpc_method_handlers = {
-      'SayHello': grpc.unary_unary_rpc_method_handler(
-          servicer.SayHello,
-          request_deserializer=HDF5__pb2.HelloRequest.FromString,
-          response_serializer=HDF5__pb2.HelloReply.SerializeToString,
+      'Request': grpc.unary_unary_rpc_method_handler(
+          servicer.Request,
+          request_deserializer=HDF5__pb2.AssetIdentifier.FromString,
+          response_serializer=HDF5__pb2.HDF5Reply.SerializeToString,
       ),
   }
   generic_handler = grpc.method_handlers_generic_handler(
-      'Greeter', rpc_method_handlers)
+      'Asset', rpc_method_handlers)
   server.add_generic_rpc_handlers((generic_handler,))

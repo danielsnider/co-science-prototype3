@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 
 from concurrent import futures
 import time
@@ -24,22 +25,21 @@ for i, filename in enumerate(glob.iglob('./images/*')):
   h5file.create_array(h5file.root, array_name, im)
   print('loaded image %s' % filename)
 
-class Greeter(HDF5_pb2_grpc.GreeterServicer):
+class Asset(HDF5_pb2_grpc.AssetServicer):
 
-  def SayHello(self, request, context):
-    # return HDF5_pb2.HelloReply(message='Hello, %s!' % request.name)
-    im = eval('h5file.root.%s' % request.name)
+  def Request(self, request, context):
+    im = eval('h5file.root.%s' % request.id)
     h5single = tables.open_file("new_im.h5", "w", driver="H5FD_CORE",
                               driver_core_backing_store=0)
     h5single.create_array(h5single.root, 'im', im.read())
     data = h5single.get_file_image().encode('base64')
     h5single.close()
-    return HDF5_pb2.HelloReply(message=data)
+    return HDF5_pb2.HDF5Reply(message=data)
 
 
 def serve():
   server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
-  HDF5_pb2_grpc.add_GreeterServicer_to_server(Greeter(), server)
+  HDF5_pb2_grpc.add_AssetServicer_to_server(Asset(), server)
   server.add_insecure_port('[::]:50051')
   server.start()
   try:
@@ -48,6 +48,7 @@ def serve():
   except KeyboardInterrupt:
     server.stop(0)
     h5file.close()
+
 
 if __name__ == '__main__':
   serve()

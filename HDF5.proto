@@ -3,17 +3,17 @@
 syntax = "proto3";
 
 // The greeting service definition.
-service Greeter {
+service Asset {
   // Sends a greeting
-  rpc SayHello (HelloRequest) returns (HelloReply) {}
+  rpc Request (AssetIdentifier) returns (HDF5Reply) {}
 }
 
 // The request message containing the user's name.
-message HelloRequest {
-  string name = 1;
+message AssetIdentifier {
+  string id = 1;
 }
 
 // The response message containing the greetings
-message HelloReply {
+message HDF5Reply {
   string message = 1;
 }

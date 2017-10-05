@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 from __future__ import print_function
 import sys
 import grpc
@@ -26,8 +28,8 @@ def run(requested_image):
   grpc_options=[('grpc.max_send_message_length', -1),
            ('grpc.max_receive_message_length', -1)]
   channel = grpc.insecure_channel('localhost:50051',options=grpc_options)
-  stub = HDF5_pb2_grpc.GreeterStub(channel)
-  response = stub.SayHello(HDF5_pb2.HelloRequest(name=requested_image))
+  asset_stub = HDF5_pb2_grpc.AssetStub(channel)
+  response = asset_stub.Request(HDF5_pb2.AssetIdentifier(id=requested_image))
   h5file = tables.open_file("in-memory-sample.h5", driver="H5FD_CORE",
                                 driver_core_image=response.message.decode('base64'),
                                 driver_core_backing_store=0)
