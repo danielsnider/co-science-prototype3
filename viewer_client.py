@@ -12,7 +12,7 @@ import numpy as np
 
 from matplotlib import pyplot as plt
 
-
+from addresses import addresses
 
 # USAGE EXAMPLE
 # $ python HDF5_client.py im1 im2 
@@ -25,10 +25,10 @@ def display_image(im):
   plt.waitforbuttonpress()
 
 
-def run(requested_image):
+def run(topic, requested_image):
   grpc_options=[('grpc.max_send_message_length', -1),
            ('grpc.max_receive_message_length', -1)]
-  channel = grpc.insecure_channel('localhost:50051',options=grpc_options)
+  channel = grpc.insecure_channel(addresses[topic],options=grpc_options)
   asset_stub = HDF5_pb2_grpc.AssetStub(channel)
   response = asset_stub.Request(HDF5_pb2.AssetIdentifier(id=requested_image))
   h5file = tables.open_file("in-memory-sample.h5", driver="H5FD_CORE",
@@ -40,8 +40,9 @@ def run(requested_image):
 
 
 def display_image_loop():
-  for requested_image in sys.argv[1:]:
-    run(requested_image)
+  topic = sys.argv[1]
+  for requested_image in sys.argv[2:]:
+    run(topic, requested_image)
 
 if __name__ == '__main__':
   while True:

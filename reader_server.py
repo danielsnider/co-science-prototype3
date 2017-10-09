@@ -13,6 +13,8 @@ import glob
 
 import tables
 
+from addresses import addresses
+
 _ONE_DAY_IN_SECONDS = 60 * 60 * 24
 
 
@@ -40,7 +42,7 @@ class Asset(HDF5_pb2_grpc.AssetServicer):
 def serve():
   server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
   HDF5_pb2_grpc.add_AssetServicer_to_server(Asset(), server)
-  server.add_insecure_port('[::]:50051')
+  server.add_insecure_port(addresses['reader'])
   server.start()
   try:
     while True:
