@@ -1,14 +1,25 @@
 
 syntax = "proto3";
 
+option java_multiple_files = true;
+option java_package = "io.grpc.examples.asset";
+option java_outer_classname = "AssetProto";
+option objc_class_prefix = "HLW";
+
+package asset;
+
+// The greeting service definition.
 service Asset {
-  rpc Request (AssetIdentifier) returns (HDF5Reply) {}
+  // Sends a greeting
+  rpc SayAsset (AssetRequest) returns (AssetReply) {}
 }
 
-message AssetIdentifier {
-  string id = 1;
+// The request message containing the user's name.
+message AssetRequest {
+  string name = 1;
 }
 
-message HDF5Reply {
+// The response message containing the greetings
+message AssetReply {
   string message = 1;
 }

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package io.grpc.examples.helloworld;
+package io.grpc.examples.asset;
 
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
@@ -24,16 +24,16 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * A simple client that requests a greeting from the {@link HelloWorldServer}.
+ * A simple client that requests a greeting from the {@link AssetServer}.
  */
-public class HelloWorldClient {
-  private static final Logger logger = Logger.getLogger(HelloWorldClient.class.getName());
+public class AssetClient {
+  private static final Logger logger = Logger.getLogger(AssetClient.class.getName());
 
   private final ManagedChannel channel;
-  private final GreeterGrpc.GreeterBlockingStub blockingStub;
+  private final AssetGrpc.AssetBlockingStub blockingStub;
 
-  /** Construct client connecting to HelloWorld server at {@code host:port}. */
-  public HelloWorldClient(String host, int port) {
+  /** Construct client connecting to Asset server at {@code host:port}. */
+  public AssetClient(String host, int port) {
     this(ManagedChannelBuilder.forAddress(host, port)
         // Channels are secure by default (via SSL/TLS). For the example we disable TLS to avoid
         // needing certificates.
@@ -42,9 +42,9 @@ public class HelloWorldClient {
   }
 
   /** Construct client for accessing RouteGuide server using the existing channel. */
-  HelloWorldClient(ManagedChannel channel) {
+  AssetClient(ManagedChannel channel) {
     this.channel = channel;
-    blockingStub = GreeterGrpc.newBlockingStub(channel);
+    blockingStub = AssetGrpc.newBlockingStub(channel);
   }
 
   public void shutdown() throws InterruptedException {
@@ -54,10 +54,10 @@ public class HelloWorldClient {
   /** Say hello to server. */
   public void greet(String name) {
     logger.info("Will try to greet " + name + " ...");
-    HelloRequest request = HelloRequest.newBuilder().setName(name).build();
-    HelloReply response;
+    AssetRequest request = AssetRequest.newBuilder().setName(name).build();
+    AssetReply response;
     try {
-      response = blockingStub.sayHello(request);
+      response = blockingStub.sayAsset(request);
     } catch (StatusRuntimeException e) {
       logger.log(Level.WARNING, "RPC failed: {0}", e.getStatus());
       return;
@@ -70,7 +70,7 @@ public class HelloWorldClient {
    * greeting.
    */
   public static void main(String[] args) throws Exception {
-    HelloWorldClient client = new HelloWorldClient("localhost", 50051);
+    AssetClient client = new AssetClient("localhost", 50051);
     try {
       /* Access a service running on the local machine on port 50051 */
       String user = "world";

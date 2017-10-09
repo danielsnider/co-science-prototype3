@@ -72,22 +72,22 @@ apply plugin: 'application'
 
 startScripts.enabled = false
 
-task helloWorldServer(type: CreateStartScripts) {
-  mainClassName = 'io.grpc.examples.helloworld.HelloWorldServer'
-  applicationName = 'hello-world-server'
+task assetServer(type: CreateStartScripts) {
+  mainClassName = 'io.grpc.examples.asset.AssetServer'
+  applicationName = 'asset-server'
   outputDir = new File(project.buildDir, 'tmp')
   classpath = jar.outputs.files + project.configurations.runtime
 }
 
-task helloWorldClient(type: CreateStartScripts) {
-  mainClassName = 'io.grpc.examples.helloworld.HelloWorldClient'
-  applicationName = 'hello-world-client'
+task assetClient(type: CreateStartScripts) {
+  mainClassName = 'io.grpc.examples.asset.AssetClient'
+  applicationName = 'asset-client'
   outputDir = new File(project.buildDir, 'tmp')
   classpath = jar.outputs.files + project.configurations.runtime
 }
 
 applicationDistribution.into('bin') {
-  from(helloWorldServer)
-  from(helloWorldClient)
+  from(assetServer)
+  from(assetClient)
   fileMode = 0755
 }
