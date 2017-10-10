@@ -1,14 +1,16 @@
 from setuptools import setup
 
 setup(
-    name='yourscript',
+    name='cos',
     version='0.1',
-    py_modules=['yourscript'],
+    py_modules=['cos'],
     install_requires=[
         'Click',
+        'ipython',
     ],
     entry_points='''
         [console_scripts]
-        yourscript=yourscript:cli
+        cos=cos:cli
     ''',
 )
+
