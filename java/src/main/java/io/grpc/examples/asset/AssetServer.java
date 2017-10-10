@@ -37,7 +37,7 @@ public class AssetServer {
         .addService(new AssetImpl())
         .build()
         .start();
-    logger.info("Server started, listening on " + port);
+    logger.info("Server starteddd, listening on " + port);
     Runtime.getRuntime().addShutdownHook(new Thread() {
       @Override
       public void run() {

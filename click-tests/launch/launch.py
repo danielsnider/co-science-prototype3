@@ -8,6 +8,9 @@ def launch():
 dirs = '/home/dan/co-science-prototype3/click-tests/pkgs/'
 pkgs = os.listdir(dirs)
 
+def _launch(node,pkg):
+  print('launching node %s from package %s' %(node,pkg))
+
 for pkg in pkgs:
   func = """@launch.group()
 @click.option('--count', default=1, help='Number of greetings.')
@@ -24,7 +27,7 @@ def {pkg}(count):
 def {node}(count):
     node = '{node}'
     pkg = '{pkg}'
-    print('launching node %s from package %s' %(node,pkg))
+    _launch(node,pkg)
       """
       func = func.format(pkg=pkg, node=node)
       exec(func)

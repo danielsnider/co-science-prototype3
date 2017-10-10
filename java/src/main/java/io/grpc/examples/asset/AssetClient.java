@@ -16,12 +16,14 @@
 
 package io.grpc.examples.asset;
 
+import imagej
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 import io.grpc.StatusRuntimeException;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 
 /**
  * A simple client that requests a greeting from the {@link AssetServer}.
@@ -38,6 +40,7 @@ public class AssetClient {
         // Channels are secure by default (via SSL/TLS). For the example we disable TLS to avoid
         // needing certificates.
         .usePlaintext(true)
+        .maxInboundMessageSize(2147483647) // Max int (1.9 GB)
         .build());
   }
 
@@ -62,7 +65,8 @@ public class AssetClient {
       logger.log(Level.WARNING, "RPC failed: {0}", e.getStatus());
       return;
     }
-    logger.info("Greeting: " + response.getMessage());
+    logger.info("IMG received.");
+    im = response.getMessage()
   }
 
   /**
@@ -73,7 +77,7 @@ public class AssetClient {
     AssetClient client = new AssetClient("localhost", 50051);
     try {
       /* Access a service running on the local machine on port 50051 */
-      String user = "world";
+      String user = "im0";
       if (args.length > 0) {
         user = args[0]; /* Use the arg as the name to greet if provided */
       }

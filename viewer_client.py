@@ -30,7 +30,7 @@ def run(topic, requested_image):
            ('grpc.max_receive_message_length', -1)]
   channel = grpc.insecure_channel(addresses[topic],options=grpc_options)
   asset_stub = HDF5_pb2_grpc.AssetStub(channel)
-  response = asset_stub.Request(HDF5_pb2.AssetIdentifier(id=requested_image))
+  response = asset_stub.SayAsset(HDF5_pb2.AssetRequest(name=requested_image))
   h5file = tables.open_file("in-memory-sample.h5", driver="H5FD_CORE",
                                 driver_core_image=response.message.decode('base64'),
                                 driver_core_backing_store=0)

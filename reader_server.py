@@ -28,15 +28,18 @@ for i, filename in enumerate(glob.iglob('./images/*')):
   print('loaded image %s' % filename)
 
 class Asset(HDF5_pb2_grpc.AssetServicer):
+  def __init__(self):
+    print("Listening...")
 
-  def Request(self, request, context):
-    im = eval('h5file.root.%s' % request.id)
+  def SayAsset(self, request, context):
+    print("Received request.")
+    im = eval('h5file.root.%s' % request.name)
     h5single = tables.open_file("new_im.h5", "w", driver="H5FD_CORE",
                               driver_core_backing_store=0)
     h5single.create_array(h5single.root, 'im', im.read())
     data = h5single.get_file_image().encode('base64')
     h5single.close()
-    return HDF5_pb2.HDF5Reply(message=data)
+    return HDF5_pb2.AssetReply(message=data)
 
 
 def serve():

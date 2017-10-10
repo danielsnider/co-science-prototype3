@@ -17,23 +17,23 @@ _sym_db = _symbol_database.Default()
 
 DESCRIPTOR = _descriptor.FileDescriptor(
   name='HDF5.proto',
-  package='',
+  package='asset',
   syntax='proto3',
-  serialized_pb=_b('\n\nHDF5.proto\"\x1d\n\x0f\x41ssetIdentifier\x12\n\n\x02id\x18\x01 \x01(\t\"\x1c\n\tHDF5Reply\x12\x0f\n\x07message\x18\x01 \x01(\t22\n\x05\x41sset\x12)\n\x07Request\x12\x10.AssetIdentifier\x1a\n.HDF5Reply\"\x00\x62\x06proto3')
+  serialized_pb=_b('\n\nHDF5.proto\x12\x05\x61sset\"\x1c\n\x0c\x41ssetRequest\x12\x0c\n\x04name\x18\x01 \x01(\t\"\x1d\n\nAssetReply\x12\x0f\n\x07message\x18\x01 \x01(\t2=\n\x05\x41sset\x12\x34\n\x08SayAsset\x12\x13.asset.AssetRequest\x1a\x11.asset.AssetReply\"\x00\x42,\n\x16io.grpc.examples.assetB\nAssetProtoP\x01\xa2\x02\x03HLWb\x06proto3')
 )
 
 
 
 
-_ASSETIDENTIFIER = _descriptor.Descriptor(
-  name='AssetIdentifier',
-  full_name='AssetIdentifier',
+_ASSETREQUEST = _descriptor.Descriptor(
+  name='AssetRequest',
+  full_name='asset.AssetRequest',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   fields=[
     _descriptor.FieldDescriptor(
-      name='id', full_name='AssetIdentifier.id', index=0,
+      name='name', full_name='asset.AssetRequest.name', index=0,
       number=1, type=9, cpp_type=9, label=1,
       has_default_value=False, default_value=_b("").decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
@@ -51,20 +51,20 @@ _ASSETIDENTIFIER = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=14,
-  serialized_end=43,
+  serialized_start=21,
+  serialized_end=49,
 )
 
 
-_HDF5REPLY = _descriptor.Descriptor(
-  name='HDF5Reply',
-  full_name='HDF5Reply',
+_ASSETREPLY = _descriptor.Descriptor(
+  name='AssetReply',
+  full_name='asset.AssetReply',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   fields=[
     _descriptor.FieldDescriptor(
-      name='message', full_name='HDF5Reply.message', index=0,
+      name='message', full_name='asset.AssetReply.message', index=0,
       number=1, type=9, cpp_type=9, label=1,
       has_default_value=False, default_value=_b("").decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
@@ -82,46 +82,48 @@ _HDF5REPLY = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=45,
-  serialized_end=73,
+  serialized_start=51,
+  serialized_end=80,
 )
 
-DESCRIPTOR.message_types_by_name['AssetIdentifier'] = _ASSETIDENTIFIER
-DESCRIPTOR.message_types_by_name['HDF5Reply'] = _HDF5REPLY
+DESCRIPTOR.message_types_by_name['AssetRequest'] = _ASSETREQUEST
+DESCRIPTOR.message_types_by_name['AssetReply'] = _ASSETREPLY
 _sym_db.RegisterFileDescriptor(DESCRIPTOR)
 
-AssetIdentifier = _reflection.GeneratedProtocolMessageType('AssetIdentifier', (_message.Message,), dict(
-  DESCRIPTOR = _ASSETIDENTIFIER,
+AssetRequest = _reflection.GeneratedProtocolMessageType('AssetRequest', (_message.Message,), dict(
+  DESCRIPTOR = _ASSETREQUEST,
   __module__ = 'HDF5_pb2'
-  # @@protoc_insertion_point(class_scope:AssetIdentifier)
+  # @@protoc_insertion_point(class_scope:asset.AssetRequest)
   ))
-_sym_db.RegisterMessage(AssetIdentifier)
+_sym_db.RegisterMessage(AssetRequest)
 
-HDF5Reply = _reflection.GeneratedProtocolMessageType('HDF5Reply', (_message.Message,), dict(
-  DESCRIPTOR = _HDF5REPLY,
+AssetReply = _reflection.GeneratedProtocolMessageType('AssetReply', (_message.Message,), dict(
+  DESCRIPTOR = _ASSETREPLY,
   __module__ = 'HDF5_pb2'
-  # @@protoc_insertion_point(class_scope:HDF5Reply)
+  # @@protoc_insertion_point(class_scope:asset.AssetReply)
   ))
-_sym_db.RegisterMessage(HDF5Reply)
+_sym_db.RegisterMessage(AssetReply)
 
 
+DESCRIPTOR.has_options = True
+DESCRIPTOR._options = _descriptor._ParseOptions(descriptor_pb2.FileOptions(), _b('\n\026io.grpc.examples.assetB\nAssetProtoP\001\242\002\003HLW'))
 
 _ASSET = _descriptor.ServiceDescriptor(
   name='Asset',
-  full_name='Asset',
+  full_name='asset.Asset',
   file=DESCRIPTOR,
   index=0,
   options=None,
-  serialized_start=75,
-  serialized_end=125,
+  serialized_start=82,
+  serialized_end=143,
   methods=[
   _descriptor.MethodDescriptor(
-    name='Request',
-    full_name='Asset.Request',
+    name='SayAsset',
+    full_name='asset.Asset.SayAsset',
     index=0,
     containing_service=None,
-    input_type=_ASSETIDENTIFIER,
-    output_type=_HDF5REPLY,
+    input_type=_ASSETREQUEST,
+    output_type=_ASSETREPLY,
     options=None,
   ),
 ])
@@ -149,10 +151,10 @@ try:
       Args:
         channel: A grpc.Channel.
       """
-      self.Request = channel.unary_unary(
-          '/Asset/Request',
-          request_serializer=AssetIdentifier.SerializeToString,
-          response_deserializer=HDF5Reply.FromString,
+      self.SayAsset = channel.unary_unary(
+          '/asset.Asset/SayAsset',
+          request_serializer=AssetRequest.SerializeToString,
+          response_deserializer=AssetReply.FromString,
           )
 
 
@@ -160,7 +162,7 @@ try:
     """The greeting service definition.
     """
 
-    def Request(self, request, context):
+    def SayAsset(self, request, context):
       """Sends a greeting
       """
       context.set_code(grpc.StatusCode.UNIMPLEMENTED)
@@ -170,14 +172,14 @@ try:
 
   def add_AssetServicer_to_server(servicer, server):
     rpc_method_handlers = {
-        'Request': grpc.unary_unary_rpc_method_handler(
-            servicer.Request,
-            request_deserializer=AssetIdentifier.FromString,
-            response_serializer=HDF5Reply.SerializeToString,
+        'SayAsset': grpc.unary_unary_rpc_method_handler(
+            servicer.SayAsset,
+            request_deserializer=AssetRequest.FromString,
+            response_serializer=AssetReply.SerializeToString,
         ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
-        'Asset', rpc_method_handlers)
+        'asset.Asset', rpc_method_handlers)
     server.add_generic_rpc_handlers((generic_handler,))
 
 
@@ -189,7 +191,7 @@ try:
     only to ease transition from grpcio<0.15.0 to grpcio>=0.15.0."""
     """The greeting service definition.
     """
-    def Request(self, request, context):
+    def SayAsset(self, request, context):
       """Sends a greeting
       """
       context.code(beta_interfaces.StatusCode.UNIMPLEMENTED)
@@ -203,11 +205,11 @@ try:
     only to ease transition from grpcio<0.15.0 to grpcio>=0.15.0."""
     """The greeting service definition.
     """
-    def Request(self, request, timeout, metadata=None, with_call=False, protocol_options=None):
+    def SayAsset(self, request, timeout, metadata=None, with_call=False, protocol_options=None):
       """Sends a greeting
       """
       raise NotImplementedError()
-    Request.future = None
+    SayAsset.future = None
 
 
   def beta_create_Asset_server(servicer, pool=None, pool_size=None, default_timeout=None, maximum_timeout=None):
@@ -217,13 +219,13 @@ try:
     file not marked beta) for all further purposes. This function was
     generated only to ease transition from grpcio<0.15.0 to grpcio>=0.15.0"""
     request_deserializers = {
-      ('Asset', 'Request'): AssetIdentifier.FromString,
+      ('asset.Asset', 'SayAsset'): AssetRequest.FromString,
     }
     response_serializers = {
-      ('Asset', 'Request'): HDF5Reply.SerializeToString,
+      ('asset.Asset', 'SayAsset'): AssetReply.SerializeToString,
     }
     method_implementations = {
-      ('Asset', 'Request'): face_utilities.unary_unary_inline(servicer.Request),
+      ('asset.Asset', 'SayAsset'): face_utilities.unary_unary_inline(servicer.SayAsset),
     }
     server_options = beta_implementations.server_options(request_deserializers=request_deserializers, response_serializers=response_serializers, thread_pool=pool, thread_pool_size=pool_size, default_timeout=default_timeout, maximum_timeout=maximum_timeout)
     return beta_implementations.server(method_implementations, options=server_options)
@@ -236,16 +238,16 @@ try:
     file not marked beta) for all further purposes. This function was
     generated only to ease transition from grpcio<0.15.0 to grpcio>=0.15.0"""
     request_serializers = {
-      ('Asset', 'Request'): AssetIdentifier.SerializeToString,
+      ('asset.Asset', 'SayAsset'): AssetRequest.SerializeToString,
     }
     response_deserializers = {
-      ('Asset', 'Request'): HDF5Reply.FromString,
+      ('asset.Asset', 'SayAsset'): AssetReply.FromString,
     }
     cardinalities = {
-      'Request': cardinality.Cardinality.UNARY_UNARY,
+      'SayAsset': cardinality.Cardinality.UNARY_UNARY,
     }
     stub_options = beta_implementations.stub_options(host=host, metadata_transformer=metadata_transformer, request_serializers=request_serializers, response_deserializers=response_deserializers, thread_pool=pool, thread_pool_size=pool_size)
-    return beta_implementations.dynamic_stub(channel, 'Asset', cardinalities, options=stub_options)
+    return beta_implementations.dynamic_stub(channel, 'asset.Asset', cardinalities, options=stub_options)
 except ImportError:
   pass
 # @@protoc_insertion_point(module_scope)

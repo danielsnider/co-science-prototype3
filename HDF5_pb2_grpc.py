@@ -14,10 +14,10 @@ class AssetStub(object):
     Args:
       channel: A grpc.Channel.
     """
-    self.Request = channel.unary_unary(
-        '/Asset/Request',
-        request_serializer=HDF5__pb2.AssetIdentifier.SerializeToString,
-        response_deserializer=HDF5__pb2.HDF5Reply.FromString,
+    self.SayAsset = channel.unary_unary(
+        '/asset.Asset/SayAsset',
+        request_serializer=HDF5__pb2.AssetRequest.SerializeToString,
+        response_deserializer=HDF5__pb2.AssetReply.FromString,
         )
 
 
@@ -25,7 +25,7 @@ class AssetServicer(object):
   """The greeting service definition.
   """
 
-  def Request(self, request, context):
+  def SayAsset(self, request, context):
     """Sends a greeting
     """
     context.set_code(grpc.StatusCode.UNIMPLEMENTED)
@@ -35,12 +35,12 @@ class AssetServicer(object):
 
 def add_AssetServicer_to_server(servicer, server):
   rpc_method_handlers = {
-      'Request': grpc.unary_unary_rpc_method_handler(
-          servicer.Request,
-          request_deserializer=HDF5__pb2.AssetIdentifier.FromString,
-          response_serializer=HDF5__pb2.HDF5Reply.SerializeToString,
+      'SayAsset': grpc.unary_unary_rpc_method_handler(
+          servicer.SayAsset,
+          request_deserializer=HDF5__pb2.AssetRequest.FromString,
+          response_serializer=HDF5__pb2.AssetReply.SerializeToString,
       ),
   }
   generic_handler = grpc.method_handlers_generic_handler(
-      'Asset', rpc_method_handlers)
+      'asset.Asset', rpc_method_handlers)
   server.add_generic_rpc_handlers((generic_handler,))
