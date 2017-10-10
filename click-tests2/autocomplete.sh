@@ -1,0 +1,1 @@
+_YOURSCRIPT_COMPLETE=source yourscript
