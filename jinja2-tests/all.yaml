@@ -1,24 +1,25 @@
 
 nodes:
-- 
-  name: reader
-  package: builtin
-  outputs:
-    - image
-  params:
-    - input files: '/home/dan/imglib2-tutorials/images/*.tiff'
-- 
-  name: filterA
+
+- name: image loader
+  file: reader.py
   package: my-filters
-  inputs:
-    - image
+  outputs: [image]
+  params: [input files: '/home/dan/imglib2-tutorials/images/*.tiff']
+ 
+- name: filters
+  file: filter.py
+  package: my-filters
+  inputs: [image]
   outputs:
-    - image.filtered (127.0.0.1:9900)
-  params:
-    - sigma: 4
-- 
-  name: viewer
+    - image.filter.gaussian
+    - image.filter.laplace
+  params: [sigma: 4]
+  
+  
+- name: viewer
+  file: viewer.py
   package: builtin
-  inputs:
-    - image.filtered (127.0.0.1:9900)
+  inputs: [image.filtered.gaussian]
+  params: [view: all]
 
