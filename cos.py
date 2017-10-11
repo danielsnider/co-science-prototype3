@@ -18,48 +18,77 @@ from addresses import addresses
 _ONE_DAY_IN_SECONDS = 60 * 60 * 24
 
 
-### SERVER
-class Asset(HDF5_pb2_grpc.AssetServicer):
+class CosService(HDF5_pb2_grpc.AssetServicer):
+  def __init__(self, params, callback):
+    self.callback = callback
+    self.input_topic = params['input_topic']
+    self.output_topic = params['output_topic']
+    self.input_url = topic_to_rpc_url(self.input_topic)
+    self.output_url = topic_to_rpc_url(self.output_topic)
+    self.num_workers = params['num_workers']
 
-  def Request(self, request, context):
-    im = get_image(request.id)
-    im2 = skimage.filters.gaussian(im,sigma=4)
+    self.grpc_server = grpc.server(futures.ThreadPoolExecutor(max_workers=self.num_workers))
+
+    grpc_options=[('grpc.max_send_message_length', -1),
+             ('grpc.max_receive_message_length', -1)]
+    channel = grpc.insecure_channel(self.input_url,options=grpc_options)
+    self.InputGetter = HDF5_pb2_grpc.AssetStub(channel)
+
+  # def ProduceOutput(self, request, context):
+  def SayAsset(self, request, context):
+    im = self.GetInput(request.name)
+    im = self.callback(im) # do user defined work
     h5single = tables.open_file("new_im.h5", "w", driver="H5FD_CORE",
                               driver_core_backing_store=0)
-    h5single.create_array(h5single.root, 'im', im2)
+    h5single.create_array(h5single.root, 'im', im)
     data = h5single.get_file_image().encode('base64')
     h5single.close()
-    return HDF5_pb2.HDF5Reply(message=data)
+    return HDF5_pb2.AssetReply(message=data)
 
-def serve():
-  server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
-  HDF5_pb2_grpc.add_AssetServicer_to_server(Asset(), server)
-  server.add_insecure_port(addresses['filterA'])
-  server.start()
-  try:
-    while True:
-      time.sleep(_ONE_DAY_IN_SECONDS)
-  except KeyboardInterrupt:
-    server.stop(0)
+  def GetInput(self, id):
+    response = self.InputGetter.SayAsset(HDF5_pb2.AssetRequest(name=id))
+    h5file = tables.open_file("in-memory-sample.h5", driver="H5FD_CORE",
+                                  driver_core_image=response.message.decode('base64'),
+                                  driver_core_backing_store=0)
+    im = h5file.root.im.read()
     h5file.close()
+    return im
+
+  def start(self):
+    HDF5_pb2_grpc.add_AssetServicer_to_server(self, self.grpc_server)
+
+    self.grpc_server.add_insecure_port(self.output_url)
+    self.grpc_server.start()
+    try:
+      while True:
+        time.sleep(_ONE_DAY_IN_SECONDS)
+    except KeyboardInterrupt:
+      self.grpc_server.stop(0)
 
 
-### CLIENT
-def get_image(requested_image):
-  grpc_options=[('grpc.max_send_message_length', -1),
-           ('grpc.max_receive_message_length', -1)]
-  channel = grpc.insecure_channel(addresses['reader'],options=grpc_options)
-  asset_stub = HDF5_pb2_grpc.AssetStub(channel)
-  response = asset_stub.Request(HDF5_pb2.AssetIdentifier(id=requested_image))
-  h5file = tables.open_file("in-memory-sample.h5", driver="H5FD_CORE",
-                                driver_core_image=response.message.decode('base64'),
-                                driver_core_backing_store=0)
-  im = h5file.root.im.read()
-  # display_image(im)
-  h5file.close()
-  return im
 
-def define_service(input=None, outtput=)
+def topic_to_rpc_url(topic):
+  # TODO: DEFINE IF NOT EXISTS
+  mapping = {
+    'image': 'localhost:50051',
+    'image.filter': 'localhost:50053'
+  }
+  return mapping[topic]
 
-if __name__ == '__main__':
-  serve()
+
+def create_service(input_topic, output_topic, callback):
+  if not callback:
+    print('error')
+    return
+
+  params = {
+    'input_topic': input_topic,
+    'output_topic': output_topic,
+    'num_workers': 10 
+  }
+
+  cos_service = CosService(params, callback)
+  cos_service.start()
+
+def init_node(name):
+  print('init node %s' % name)
