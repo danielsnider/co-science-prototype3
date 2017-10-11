@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 
+from threading import Thread
+
 from concurrent import futures
 import time
 
@@ -34,6 +36,8 @@ class CosService(HDF5_pb2_grpc.AssetServicer):
     channel = grpc.insecure_channel(self.input_url,options=grpc_options)
     self.InputGetter = HDF5_pb2_grpc.AssetStub(channel)
 
+    self.start()
+
   # def ProduceOutput(self, request, context):
   def SayAsset(self, request, context):
     im = self.GetInput(request.name)
@@ -59,6 +63,7 @@ class CosService(HDF5_pb2_grpc.AssetServicer):
 
     self.grpc_server.add_insecure_port(self.output_url)
     self.grpc_server.start()
+    print('ready to produce %s' % self.output_topic)
     try:
       while True:
         time.sleep(_ONE_DAY_IN_SECONDS)
@@ -71,7 +76,8 @@ def topic_to_rpc_url(topic):
   # TODO: DEFINE IF NOT EXISTS
   mapping = {
     'image': 'localhost:50051',
-    'image.filter': 'localhost:50053'
+    'image.filter.gaussian': 'localhost:50052',
+    'image.filter.laplace': 'localhost:50053'
   }
   return mapping[topic]
 
@@ -87,8 +93,15 @@ def create_service(input_topic, output_topic, callback):
     'num_workers': 10 
   }
 
-  cos_service = CosService(params, callback)
-  cos_service.start()
+  thread = Thread(target = CosService, args = (params, callback))
+  # thread.daemon = True # So that it stops when the parent is stopped
+  thread.start()
+  # try:
+  #   while True:
+  #     time.sleep(_ONE_DAY_IN_SECONDS)
+  # except KeyboardInterrupt:
+  #   self.grpc_server.stop(0)
+
 
 def init_node(name):
   print('init node %s' % name)
