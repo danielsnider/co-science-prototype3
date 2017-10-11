@@ -105,3 +105,19 @@ def create_service(input_topic, output_topic, callback):
 
 def init_node(name):
   print('init node %s' % name)
+
+
+
+
+def service_request(topic, id):
+  grpc_options=[('grpc.max_send_message_length', -1),
+           ('grpc.max_receive_message_length', -1)]
+  channel = grpc.insecure_channel(addresses[topic],options=grpc_options)
+  asset_stub = HDF5_pb2_grpc.AssetStub(channel)
+  response = asset_stub.SayAsset(HDF5_pb2.AssetRequest(name=id))
+  h5file = tables.open_file("in-memory-sample.h5", driver="H5FD_CORE",
+                                driver_core_image=response.message.decode('base64'),
+                                driver_core_backing_store=0)
+  im = h5file.root.im.read()
+  h5file.close()
+  return im
