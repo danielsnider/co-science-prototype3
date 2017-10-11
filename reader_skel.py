@@ -1,22 +1,10 @@
 #!/usr/bin/env python
 
-from concurrent import futures
-import time
-
-import grpc
-
-import HDF5_pb2
-import HDF5_pb2_grpc
 import skimage
 import skimage.io
 import glob
-
 import tables
-
-from addresses import addresses
-
-_ONE_DAY_IN_SECONDS = 60 * 60 * 24
-
+import cos
 
 h5file = tables.open_file("new_sample.h5", "w", driver="H5FD_CORE",
                           driver_core_backing_store=0)
@@ -27,33 +15,9 @@ for i, filename in enumerate(glob.iglob('./images/*')):
   h5file.create_array(h5file.root, array_name, im)
   print('loaded image %s' % filename)
 
-class Asset(HDF5_pb2_grpc.AssetServicer):
-  def __init__(self):
-    print("Listening...")
-
-  def SayAsset(self, request, context):
-    print("Received request.")
-    im = eval('h5file.root.%s' % request.name)
-    h5single = tables.open_file("new_im.h5", "w", driver="H5FD_CORE",
-                              driver_core_backing_store=0)
-    h5single.create_array(h5single.root, 'im', im.read())
-    data = h5single.get_file_image().encode('base64')
-    h5single.close()
-    return HDF5_pb2.AssetReply(message=data)
-
-
-def serve():
-  server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
-  HDF5_pb2_grpc.add_AssetServicer_to_server(Asset(), server)
-  server.add_insecure_port(addresses['reader'])
-  server.start()
-  try:
-    while True:
-      time.sleep(_ONE_DAY_IN_SECONDS)
-  except KeyboardInterrupt:
-    server.stop(0)
-    h5file.close()
-
+def get_resource_callback(request):
+  return eval('h5file.root.%s' % request.name)
 
 if __name__ == '__main__':
-  serve()
+  cos.init_node('reader')
+  cos.provide_resource(output_topic='image', callback=get_resource_callback)

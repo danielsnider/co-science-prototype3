@@ -21,7 +21,7 @@ def display_image(im):
 def request_image():
   topic = sys.argv[1]
   requested_image = sys.argv[2]
-  im = cos.service_request(topic, requested_image)
+  im = cos.cos_request(topic, requested_image)
   display_image(im)
 
 if __name__ == '__main__':
