@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+print "tset"
 import click
 
 from launch import launch
@@ -25,5 +27,8 @@ cli.add_command(one)
 cli.add_command(two)
 cli.add_command(launch.launch)
 
-# eval "$(_YOURSCRIPT_COMPLETE=source yourscript)"
-# eval "$(_COS_COMPLETE=source cos)"
+def main():
+    cli()
+
+if __name__ == '__main__':
+    main()

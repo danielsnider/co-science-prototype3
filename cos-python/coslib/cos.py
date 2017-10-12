@@ -106,8 +106,6 @@ def init_node(name):
   print('init node %s' % name)
 
 
-
-
 def cos_request(topic, id):
   grpc_options=[('grpc.max_send_message_length', -1),
            ('grpc.max_receive_message_length', -1)]
@@ -165,3 +163,4 @@ def provide_resource(output_topic=None, callback=None):
   thread = Thread(target = CosResource, args = (params, callback))
   # thread.daemon = True # So that it stops when the parent is stopped
   thread.start()
+

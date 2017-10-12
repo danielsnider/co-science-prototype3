@@ -7,10 +7,16 @@ setup(
     install_requires=[
         'Click',
         'ipython',
+        'futures',
+        'grpcio',
+        'scikit-image',
+        'tables',
+        'pyyaml',
+        'glob2',
     ],
     entry_points='''
         [console_scripts]
-        cos=cos:cli
+        cos=cos:main
     ''',
 )
 
