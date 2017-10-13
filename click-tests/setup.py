@@ -1,4 +1,8 @@
-from setuptools import setup
+from setuptools import setup, find_packages
+
+
+packages = find_packages('.')
+print(packages)
 
 setup(
     name='cos',
@@ -18,5 +22,7 @@ setup(
         [console_scripts]
         cos=cos:main
     ''',
+    packages=find_packages('.'),
+
 )
 
