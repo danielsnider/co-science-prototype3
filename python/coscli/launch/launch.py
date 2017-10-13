@@ -1,4 +1,4 @@
-from cos_python.coslib import cos_packages
+from coslib.coslib import cos_packages
 import yaml
 import os
 import click

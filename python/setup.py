@@ -20,9 +20,11 @@ setup(
     ],
     entry_points='''
         [console_scripts]
-        cos=cos:main
+        cos=coscli:main
     ''',
-    packages=find_packages('.'),
+    packages=['coscli', 'coscli.launch', 'coslib'],
+    # packages=find_packages('.').append('coslib'),
+    package_dir = {'coslib': 'coslib/src'},
 
 )
 
