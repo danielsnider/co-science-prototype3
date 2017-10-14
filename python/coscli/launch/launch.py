@@ -6,7 +6,8 @@ import glob2
 
 @click.group()
 def launch():
-    pass
+  """Launch multiple COS nodes."""
+  pass
 
 pkgs = cos_packages.collect_package_info()
 

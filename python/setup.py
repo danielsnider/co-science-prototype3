@@ -24,7 +24,7 @@ setup(
     ''',
     packages=['coscli', 'coscli.launch', 'coslib'],
     # packages=find_packages('.').append('coslib'),
-    package_dir = {'coslib': 'coslib/src'},
+    package_dir = {'coslib': 'coslib/coslib'},
 
 )
 
