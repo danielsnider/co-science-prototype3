@@ -74,9 +74,9 @@ class CosService(HDF5_pb2_grpc.AssetServicer):
 def topic_to_rpc_url(topic):
   # TODO: DEFINE IF NOT EXISTS
   mapping = {
-    'image': 'localhost:50051',
-    'image.filter.gaussian': 'localhost:50052',
-    'image.filter.laplace': 'localhost:50053'
+    'image': '172.17.0.1:50051',
+    'image.filter.gaussian': '172.17.0.2:50052',
+    'image.filter.laplace': '172.17.0.2:50053'
   }
   return mapping[topic]
 

@@ -13,7 +13,8 @@ pkgs = cos_packages.collect_package_info()
 
 
 def _launch(node,pkg):
-  print('launching node %s from package %s' %(node,pkg))
+  print(vars(node))
+  print('launching ssnode %s from package %s' %(node,pkg))
 
 # TODO: MAJOR SECURITY FLAW, exec should not run any pkg_name or launch_file name!
 for pkg in pkgs:

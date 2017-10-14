@@ -3,10 +3,9 @@
 import sys
 import tables
 import numpy as np
-import cos
+from coslib.coslib import cos
 
 from matplotlib import pyplot as plt
-from addresses import addresses
 
 # USAGE EXAMPLE
 # $ python viewer.py TOPIC IMG_ID

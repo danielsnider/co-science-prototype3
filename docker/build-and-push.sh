@@ -9,13 +9,20 @@ sudo apt-get install -y docker-ce
 
 
 # Build Docker image
-docker build -f docker/Dockerfile.base -t cos-base .
+sudo docker build -f docker/Dockerfile.base -t cos-base .
 
 # Test Docker image
-docker run cos-base
+sudo docker run cos-base
+sudo docker run --entrypoint "cos" cos-base launch # modify entry command
+sudo docker run -it --entrypoint "/bin/bash" cos-base # interactive
+sudo docker run -p 50052:50052 -p 50053:50053 --entrypoint "python" cos-app /cos_packages/filters/src/filter.py
+
+# Stop Docker image
+sudo docker stop `sudo docker ps -l -q`
 
 # Snapshot Docker image
-sudo docker commit 8ec3ea116cf03736e257004d0306bc2919e36b3c7e522034d8535b29c7340a63 danielsnider/cos-base:latest 
+sudo docker ps -a # get container ID
+sudo docker commit 6b41bf410fbf danielsnider/cos-base:latest
 
 # Login to Dockerhub
 sudo docker login

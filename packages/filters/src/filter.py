@@ -1,9 +1,8 @@
 #!/usr/bin/env python
-
 import skimage
 import skimage.filters
 import tables
-import cos
+from coslib.coslib import cos
 
 
 def gaussian_filter(im):
@@ -17,6 +16,7 @@ def laplacian_filter(im):
   return im
 
 if __name__ == '__main__':
+  print "starting "
   cos.init_node('filter')
   cos.create_service(input_topic='image', output_topic='image.filter.gaussian', callback=gaussian_filter)
   cos.create_service(input_topic='image', output_topic='image.filter.laplace', callback=laplacian_filter)

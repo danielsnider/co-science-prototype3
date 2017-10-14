@@ -14,22 +14,30 @@ RUN apt-get install -y python python-dev python-pip python-virtualenv
 # Update pip.
 RUN pip install --upgrade pip
 
+## Install tools to aid development (TODO: not for prod)
+RUN apt-get install -y wget curl vim git tmux ping telnet nc tpcdump
+
 # Clean up cached packages.
 RUN rm -rf /var/lib/apt/lists/*
 
 # Define working directory.
 WORKDIR /cos/
 
+RUN virtualenv venv
+RUN . venv/bin/activate
+
+
+# Install dependencies.
+ADD python/requirements.txt .
+RUN pip install -r requirements.txt
+
 # Copy config.
-COPY ./etc/config.yaml /etc/cos/config.yaml
+COPY docker/etc/config.yaml /etc/cos/config.yaml
 
 # Copy code.
 COPY python /cos/
 
 # Install code.
-RUN virtualenv venv
-RUN . venv/bin/activate
-RUN pip install --editable .
+RUN pip install -e .
 
-#EXPOSE 8080
-CMD cos
+ENTRYPOINT cos

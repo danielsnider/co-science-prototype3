@@ -1,0 +1,8 @@
+Click
+ipython
+futures
+grpcio
+scikit-image
+tables
+pyyaml
+glob2

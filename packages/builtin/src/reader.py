@@ -4,7 +4,7 @@ import skimage
 import skimage.io
 import glob
 import tables
-import cos
+from coslib.coslib import cos
 
 h5file = tables.open_file("new_sample.h5", "w", driver="H5FD_CORE",
                           driver_core_backing_store=0)
