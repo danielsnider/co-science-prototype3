@@ -1,0 +1,35 @@
+#
+# Cos-Base Dockerfile
+#
+# https://github.com/danielsnider
+#
+
+FROM ubuntu:16.04
+MAINTAINER Daniel Snider<danielsnider12@gmail.com>
+
+RUN apt-get -y update
+
+## Install Python.
+RUN apt-get install -y python python-dev python-pip python-virtualenv
+# Update pip.
+RUN pip install --upgrade pip
+
+# Clean up cached packages.
+RUN rm -rf /var/lib/apt/lists/*
+
+# Define working directory.
+WORKDIR /cos/
+
+# Copy config.
+COPY ./etc/config.yaml /etc/cos/config.yaml
+
+# Copy code.
+COPY python /cos/
+
+# Install code.
+RUN virtualenv venv
+RUN . venv/bin/activate
+RUN pip install --editable .
+
+#EXPOSE 8080
+CMD cos
