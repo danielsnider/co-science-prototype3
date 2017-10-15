@@ -1,0 +1,26 @@
+{
+  "services": [
+    {
+      "name": "filters",
+      "tags": [
+        "python",
+        "image.filter.gaussian",
+        "image.filter.laplacian"
+      ],
+      "port": 6000,
+      "check": {
+        "name": "ping",
+        "script": "ping -c1 127.0.0.1 >/dev/null",
+        "interval": "30s"
+      }
+    },
+    {
+      "name": "filters",
+      "tags": [
+        "client_extension",
+        "python"
+      ],
+      "port": 7000
+    }
+  ]
+}

@@ -1,0 +1,9 @@
+{
+  "data_dir": "/home/dan/co-science-prototype3/consul",
+  "log_level": "DEBUG",
+  "node_name": "laptop",
+  "node_meta": {
+    "os_version": "Ubuntu 16.04"
+  },
+  "enable_script_checks": true
+}

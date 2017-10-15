@@ -15,7 +15,7 @@ sudo docker build -f docker/Dockerfile.base -t cos-base .
 sudo docker run cos-base
 sudo docker run --entrypoint "cos" cos-base launch # modify entry command
 sudo docker run -it --entrypoint "/bin/bash" cos-base # interactive
-sudo docker run -p 50052:50052 -p 50053:50053 --entrypoint "python" cos-app /cos_packages/filters/src/filter.py
+sudo docker run -t -p 50052:50052 -p 50053:50053 --entrypoint "python" cos-app /cos_packages/filters/src/filter.py
 
 # Stop Docker image
 sudo docker stop `sudo docker ps -l -q`
