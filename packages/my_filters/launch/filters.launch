@@ -1,0 +1,20 @@
+nodes:
+
+- name: filters
+  file: filter.py
+  package: my_filters
+  input: 
+    - image
+  output:
+    - image.filter.gaussian: gaus
+    - image.filter.laplace
+  params: 
+    - sigma: 4
+
+- name: viewer
+  file: viewer.py
+  package: builtin
+  inputs: 
+    - image: [gaus, image]
+  params:
+
