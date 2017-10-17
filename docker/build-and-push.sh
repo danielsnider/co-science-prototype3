@@ -17,8 +17,8 @@ sudo docker run --entrypoint "cos" cos-base launch # modify entry command
 sudo docker run -it --entrypoint "/bin/bash" cos-base # interactive
 sudo docker run -t -p 50052:50052 -p 50053:50053 --entrypoint "python" cos-app /cos_packages/filters/src/filter.py
 
-# Stop Docker image
-sudo docker stop `sudo docker ps -l -q`
+# Kill Docker container
+sudo docker kill `sudo docker ps -l -q`
 
 # Snapshot Docker image
 sudo docker ps -a # get container ID
@@ -29,5 +29,7 @@ sudo docker login
 
 # Push to Dockerhub
 sudo docker push danielsnider/cos-base
+
+
 
  

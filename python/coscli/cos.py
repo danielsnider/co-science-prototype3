@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-print "tset"
 import click
 
 from launch import launch

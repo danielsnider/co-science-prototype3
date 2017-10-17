@@ -1,6 +1,7 @@
 {
   "services": [
     {
+      "id": "ope",
       "name": "filters",
       "tags": [
         "python",
@@ -15,6 +16,7 @@
       }
     },
     {
+      "id": "filt",
       "name": "filters",
       "tags": [
         "client_extension",

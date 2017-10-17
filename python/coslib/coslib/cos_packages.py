@@ -22,6 +22,10 @@ def collect_package_info():
       packages.append(pkg)
   return packages
 
+def get_package_info(package_name):
+  pkgs = collect_package_info()
+  pkg = [pkg for pkg in pkgs if pkg['name'] == package_name][0]
+  return pkg
 
 # EXAMPLE RETURN VALUE
 # [{'authors': ['Daniel Snider'],

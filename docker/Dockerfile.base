@@ -15,7 +15,7 @@ RUN apt-get install -y python python-dev python-pip python-virtualenv
 RUN pip install --upgrade pip
 
 ## Install tools to aid development (TODO: not for prod)
-RUN apt-get install -y wget curl vim git tmux ping telnet nc tpcdump
+RUN apt-get install -y wget curl vim git tmux iputils-ping netcat
 
 # Clean up cached packages.
 RUN rm -rf /var/lib/apt/lists/*
