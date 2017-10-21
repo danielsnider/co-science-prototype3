@@ -14,16 +14,18 @@ def launch():
 pkgs = cos_packages.collect_package_info()
 
 
-def _launch(launch_file,pkg):
+def _launch(launch_file,pkg_info):
   """Do the real work of launching nodes"""
   # pprint.pprint(launch_file)
   launch_config = yaml.load(file(launch_file, 'r'))
   launch_name = os.path.basename(launch_file)
   nodes = launch_config['nodes']
 
+  # TODO jinja and cli args
+
   print('\nLAUNCH SUMMARY')
   print('===============')
-  print('Package: %s' % pkg['name'])
+  print('Package: %s' % pkg_info['name'])
   print('File: %s' % launch_file)
   print('\nPARAMETERS\n')
   for node in nodes:
@@ -36,12 +38,25 @@ def _launch(launch_file,pkg):
     print(' - %s (%s/%s)' % (node['name'],node['package'],node['file']))
   print('\n')
 
+
+  method_to_store_every_pkg_ver = 'tar'
+  if method_to_store_every_pkg_ver == 'tar':
+    print('Collecting package hash...')
+    sha = cos_packages.get_package_src_sha(pkg_info)
+    print('Package hash: %s' % sha)
+    pkg_info['src_sha'] = sha
+    # tar = cos_packages.get_package_src_tar(pkg_info)
+
+  # store package info, shar and param info in KV store
+  # store package tar in where?
+
   for node in nodes:
-    cos_nodes.run(node)
+    cos_nodes.run(pkg_info, node)
 
 
 def define_launchable_commands():
   # TODO: MAJOR SECURITY FLAW, exec should not run any pkg_name or launch_file name!
+  print('launch1')
   for pkg in pkgs:
     func = """
 @launch.group()
@@ -62,5 +77,6 @@ def {launch_name}(count):
       """
         func = func.format(pkg_name=pkg['name'], launch_name=launch_name, launch_file=launch_file, pkg=pkg)
         exec(func)
+  print('launch2')
 
 define_launchable_commands()

@@ -1,4 +1,7 @@
 from setuptools import setup, find_packages
+import sys
+
+import fastentrypoints
 
 packages = find_packages('.')
 print(packages)
@@ -13,7 +16,6 @@ setup(
         cos=coscli:main
     ''',
     packages=['coscli', 'coscli.launch', 'coslib'],
-    # packages=find_packages('.').append('coslib'),
     package_dir = {'coslib': 'coslib/coslib'},
 
 )

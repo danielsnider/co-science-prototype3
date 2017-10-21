@@ -6,3 +6,4 @@ scikit-image
 tables
 pyyaml
 glob2
+requests

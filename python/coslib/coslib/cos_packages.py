@@ -3,6 +3,9 @@ import glob2
 import os
 
 def collect_package_info():
+  # TODO: Don't GLOB 3 times each loop, do it once?
+  # TODO: Print warning if too many files detected and slowdown occurs
+  print('searching for packages')
   conf = yaml.load(file('/etc/cos/config.yaml', 'r'))
   packages = []
   for pkg_path in conf['package paths']:
@@ -20,6 +23,7 @@ def collect_package_info():
       for src_file in glob2.glob('%s/launch/**/*.launch' % found_pkg_path, recursive=True):
         pkg['launch files'].append(src_file)
       packages.append(pkg)
+  print('found %s packages.' % len(packages))
   return packages
 
 def get_package_info(package_name):
@@ -46,3 +50,37 @@ def get_package_info(package_name):
 #   'nodes': [],
 #   'path': '/home/dan/co-science-prototype3/temp',
 #   'version': 0.1}]
+
+def get_package_src_sha(pkg_name=None, pkg_info=None):
+  if not any([pkg_name, pkg_info]):
+    raise('Must supply package name of info')
+  if not pkg_info:
+    pkg_info = get_package_info(pkg_name)
+
+  ## Node Source Hash
+  for filename in glob.iglob(pkg['path'] + '/*'):
+    # create a hash of of all the file names and file contents for a node's source directory
+    node_hash = hashlib.sha1()
+    with open(filename, "rb") as node_file:
+      print filename
+      file_contents = node_file.read()
+      node_hash.update(filename)
+      node_hash.update(file_contents)
+  sha=node_hash.hexdigest()
+  return sha
+
+
+# def get_package_src_tar(........)
+  # ## Node Source Tar
+  # # TODO: add tar compression
+  # file_obj = io.BytesIO() # in memory file to hold tar.bz of node files. Not neccessary to write to disk, it will be written to the database
+  # tar_writter = tarfile.open(mode='w', fileobj=file_obj) # create a tar writer
+  # tar_writter.add(node['path']) # write tar content to file_obj
+  # tar_data = file_obj.getvalue()
+  # # write tar data  to db
+  # node['source_tar'] = tar_data
+  # # If you wish to recover the tar data as a file:
+  # # with open('out.tar', "wb") as outfile:
+  # #   outfile.write(tar_data)
+  # # To untar the archive:
+  # # $ tar -xvf out.tar

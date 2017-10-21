@@ -1,5 +1,7 @@
+*.h5
 *.tar*
 .idea
 *.pyc
 *.sqlite
 #images/
+old/
