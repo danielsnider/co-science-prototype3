@@ -1,20 +1,15 @@
 from coslib.coslib import cos_packages
 from coslib.coslib import cos_nodes
 import yaml
-import os
 import click
-import glob2
-import pprint
+import os
 
 @click.group()
 def launch():
   """Launch multiple COS nodes."""
   pass # This defines the CLI command group.
 
-pkgs = cos_packages.collect_package_info()
-
-
-def _launch(launch_file,pkg_info):
+def _launch(launch_file,this_package,pkg_info):
   """Do the real work of launching nodes"""
   # pprint.pprint(launch_file)
   launch_config = yaml.load(file(launch_file, 'r'))
@@ -23,9 +18,9 @@ def _launch(launch_file,pkg_info):
 
   # TODO jinja and cli args
 
+
   print('\nLAUNCH SUMMARY')
   print('===============')
-  print('Package: %s' % pkg_info['name'])
   print('File: %s' % launch_file)
   print('\nPARAMETERS\n')
   for node in nodes:
@@ -39,24 +34,24 @@ def _launch(launch_file,pkg_info):
   print('\n')
 
 
-  method_to_store_every_pkg_ver = 'tar'
-  if method_to_store_every_pkg_ver == 'tar':
-    print('Collecting package hash...')
-    sha = cos_packages.get_package_src_sha(pkg_info)
-    print('Package hash: %s' % sha)
-    pkg_info['src_sha'] = sha
-    # tar = cos_packages.get_package_src_tar(pkg_info)
-
-  # store package info, shar and param info in KV store
-  # store package tar in where?
 
   for node in nodes:
-    cos_nodes.run(pkg_info, node)
+    pkg = [pkg for pkg in pkg_info if pkg['name'] == node['package']][0]
+    method_to_store_every_pkg_ver = 'tar'
+    if method_to_store_every_pkg_ver == 'tar':
+      # print('Collecting package hash...')
+      sha = cos_packages.get_package_src_sha(pkg_info=pkg)
+      # print('Package hash: %s' % sha)
+      pkg['src_sha'] = sha
+      # store package info, shar and param info in KV store
+      # store package tar in where?
+    cos_nodes.run(pkg, node)
 
 
 def define_launchable_commands():
   # TODO: MAJOR SECURITY FLAW, exec should not run any pkg_name or launch_file name!
-  print('launch1')
+  pkgs = cos_packages.collect_package_info()
+
   for pkg in pkgs:
     func = """
 @launch.group()
@@ -73,10 +68,9 @@ def {pkg_name}(count):
 @{pkg_name}.command()
 @click.option('--count', default=1, help='Number of greetings.')
 def {launch_name}(count):
-    _launch('{launch_file}',{pkg})
+    _launch('{launch_file}',{pkg},{pkgs})
       """
-        func = func.format(pkg_name=pkg['name'], launch_name=launch_name, launch_file=launch_file, pkg=pkg)
+        func = func.format(pkg_name=pkg['name'], launch_name=launch_name, launch_file=launch_file, pkg=pkg, pkgs=pkgs)
         exec(func)
-  print('launch2')
 
 define_launchable_commands()

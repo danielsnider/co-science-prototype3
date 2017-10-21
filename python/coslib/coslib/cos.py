@@ -9,12 +9,10 @@ import grpc
 
 import HDF5_pb2
 import HDF5_pb2_grpc
-import skimage
-import skimage.filters
-import glob
 
 import tables
 
+from coslib.coslib.cos_logging import logger, logdebug, loginfo, logwarn, logerr, logcritical
 
 _ONE_DAY_IN_SECONDS = 60 * 60 * 24
 
@@ -62,7 +60,7 @@ class CosService(HDF5_pb2_grpc.AssetServicer):
 
     self.grpc_server.add_insecure_port(self.output_url)
     self.grpc_server.start()
-    print('ready to produce %s' % self.output_topic)
+    loginfo('ready to produce %s' % self.output_topic)
     try:
       while True:
         time.sleep(_ONE_DAY_IN_SECONDS)
@@ -78,12 +76,17 @@ def topic_to_rpc_url(topic):
     'image.filter.gaussian': '172.17.0.2:50052',
     'image.filter.laplace': '172.17.0.2:50053'
   }
+  mapping = {
+    'image': '127.0.0.1:50051',
+    'image.filter.gaussian': '127.0.0.1:50052',
+    'image.filter.laplace': '127.0.0.1:50053'
+  }
   return mapping[topic]
 
 
 def create_service(input_topic, output_topic, callback):
   if not callback:
-    print('error')
+    logerr('error')
     return
 
   params = {
@@ -103,7 +106,8 @@ def create_service(input_topic, output_topic, callback):
 
 
 def init_node(name):
-  print('init node %s' % name)
+  logger.name = name
+  loginfo('init node %s' % name)
 
 
 def cos_request(topic, id):
@@ -122,7 +126,7 @@ def cos_request(topic, id):
 class CosResource(HDF5_pb2_grpc.AssetServicer):
   def __init__(self, params, callback):
     self.output_topic = params['output_topic']
-    print("Providing resource on topic %s ..." % self.output_topic)
+    loginfo("Providing resource on topic %s ..." % self.output_topic)
     self.output_url = topic_to_rpc_url(self.output_topic)
     self.num_workers = params['num_workers']
 
@@ -131,7 +135,7 @@ class CosResource(HDF5_pb2_grpc.AssetServicer):
     self.start()
 
   def SayAsset(self, request, context):
-    print("Received request.")
+    loginfo("Received request.")
     im = self.callback(request)
     h5single = tables.open_file("new_im.h5", "w", driver="H5FD_CORE",
                               driver_core_backing_store=0)
@@ -144,7 +148,7 @@ class CosResource(HDF5_pb2_grpc.AssetServicer):
     HDF5_pb2_grpc.add_AssetServicer_to_server(self, self.grpc_server)
     self.grpc_server.add_insecure_port(self.output_url)
     self.grpc_server.start()
-    print('ready to provide %s' % self.output_topic)
+    loginfo('ready to provide %s' % self.output_topic)
     try:
       # TODO: check if stopped, check for new params? PUSH would be better than polling
       while True:
@@ -163,4 +167,3 @@ def provide_resource(output_topic=None, callback=None):
   thread = Thread(target = CosResource, args = (params, callback))
   # thread.daemon = True # So that it stops when the parent is stopped
   thread.start()
-

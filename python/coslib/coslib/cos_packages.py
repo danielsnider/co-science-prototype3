@@ -1,11 +1,14 @@
 import yaml
 import glob2
 import os
+import click
+
+from hashlib import sha1
 
 def collect_package_info():
   # TODO: Don't GLOB 3 times each loop, do it once?
   # TODO: Print warning if too many files detected and slowdown occurs
-  print('searching for packages')
+  # print('searching for packages')
   conf = yaml.load(file('/etc/cos/config.yaml', 'r'))
   packages = []
   for pkg_path in conf['package paths']:
@@ -23,7 +26,7 @@ def collect_package_info():
       for src_file in glob2.glob('%s/launch/**/*.launch' % found_pkg_path, recursive=True):
         pkg['launch files'].append(src_file)
       packages.append(pkg)
-  print('found %s packages.' % len(packages))
+  # print('found %s packages.' % len(packages))
   return packages
 
 def get_package_info(package_name):
@@ -58,11 +61,11 @@ def get_package_src_sha(pkg_name=None, pkg_info=None):
     pkg_info = get_package_info(pkg_name)
 
   ## Node Source Hash
-  for filename in glob.iglob(pkg['path'] + '/*'):
+  for filename in glob2.iglob(pkg_info['path'] + '/*'):
     # create a hash of of all the file names and file contents for a node's source directory
-    node_hash = hashlib.sha1()
+    node_hash = sha1()
+    if os.path.isdir(filename): continue
     with open(filename, "rb") as node_file:
-      print filename
       file_contents = node_file.read()
       node_hash.update(filename)
       node_hash.update(file_contents)
