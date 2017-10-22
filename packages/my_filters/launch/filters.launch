@@ -15,6 +15,11 @@ nodes:
   file: viewer.py
   package: builtin
   inputs: 
-    - image: [gaus, image]
+    - image: gaus
   params:
+
+
+actions:
+
+-  viewer: 'im0'
 

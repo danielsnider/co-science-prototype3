@@ -16,8 +16,10 @@ def laplacian_filter(im):
   return im
 
 if __name__ == '__main__':
-  cos.loginfo('starting filter node')
   cos.init_node('filter')
-  cos.create_service(input_topic='image', output_topic='image.filter.gaussian', callback=gaussian_filter)
-  cos.create_service(input_topic='image', output_topic='image.filter.laplace', callback=laplacian_filter)
-
+  cos.prosumer(In='image', out='image.filter.gaussian', cb=gaussian_filter)
+  cos.prosumer(In='image', out='image.filter.laplace', cb=laplacian_filter)
+  try:
+    cos.spin()
+  except KeyboardInterrupt:
+    cos.loginfo('exiting filter')

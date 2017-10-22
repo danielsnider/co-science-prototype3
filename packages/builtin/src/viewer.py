@@ -4,11 +4,7 @@ import sys
 import tables
 import numpy as np
 from coslib.coslib import cos
-
 from matplotlib import pyplot as plt
-
-# USAGE EXAMPLE
-# $ python viewer.py TOPIC IMG_ID
 
 plt.ion()
 def display_image(im):
@@ -17,11 +13,18 @@ def display_image(im):
   plt.show(block=False)
   plt.waitforbuttonpress()
 
-def request_image():
-  topic = sys.argv[1]
-  requested_image = sys.argv[2]
-  im = cos.cos_request(topic, requested_image)
-  display_image(im)
+# USAGE EXAMPLE
+# $ python viewer.py TOPIC IMG_ID
+# def request_image():
+#   topic = sys.argv[1]
+#   requested_image = sys.argv[2]
+#   im = cos.cos_request(topic, requested_image)
+#   display_image(im)
 
 if __name__ == '__main__':
-  request_image()
+  cos.init_node('viewer')
+  cos.consumer(In='image', cb=display_image)
+  try:
+    cos.spin()
+  except KeyboardInterrupt:
+    cos.loginfo('exiting viewer')

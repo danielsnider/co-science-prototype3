@@ -1,8 +1,12 @@
+import time
+from threading import Thread
 from coslib.coslib import cos_packages
 from coslib.coslib import cos_nodes
 import yaml
 import click
 import os
+
+_ONE_DAY_IN_SECONDS = 60 * 60 * 24
 
 @click.group()
 def launch():
@@ -45,8 +49,27 @@ def _launch(launch_file,this_package,pkg_info):
       pkg['src_sha'] = sha
       # store package info, shar and param info in KV store
       # store package tar in where?
-    cos_nodes.run(pkg, node)
 
+    # Generate mapping from topic to GRPC IP/port
+    generate_grpc_mapping(pkg, node)
+
+    thread = Thread(target=cos_nodes.run, args=(pkg, node))
+    thread.daemon = True # So that it stops when the parent is stopped
+    thread.start()
+
+  actions = launch_config['actions']
+  for action in actions:
+    print(action)
+
+  try:
+    while True:
+      time.sleep(_ONE_DAY_IN_SECONDS)
+  except KeyboardInterrupt:
+    pass
+
+
+def generate_grpc_mapping(pkg, node):
+  pass
 
 def define_launchable_commands():
   # TODO: MAJOR SECURITY FLAW, exec should not run any pkg_name or launch_file name!

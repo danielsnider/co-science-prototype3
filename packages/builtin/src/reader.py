@@ -13,11 +13,16 @@ for i, filename in enumerate(glob.iglob('../images/*')):
   im = skimage.io.imread(filename)
   array_name = "im%s" % i # eg. im1, im2, etc.
   h5file.create_array(h5file.root, array_name, im)
-  print('loaded image %s' % filename)
+  cos.loginfo('loaded image %s' % filename)
 
 def get_resource_callback(request):
   return eval('h5file.root.%s' % request.name)
 
 if __name__ == '__main__':
   cos.init_node('reader')
-  cos.provide_resource(output_topic='image', callback=get_resource_callback)
+  cos.producer(out='image', cb=get_resource_callback)
+  try:
+    cos.spin()
+  except KeyboardInterrupt:
+    h5file.close()
+    cos.loginfo('exiting reader')
