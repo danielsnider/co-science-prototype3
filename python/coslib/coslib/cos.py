@@ -21,6 +21,7 @@ def topic_to_rpc_url(topic):
   #   'viewer_trigger': '127.0.0.1:50054'
   # }
   mapping = {
+    # 'image': '127.0.0.1:0', # AUTO-SET PORT NUMBER
     'image': '127.0.0.1:50051',
     'image.filter.gaussian': '127.0.0.1:50052',
     'gaus': '127.0.0.1:50052',
@@ -41,16 +42,20 @@ def init_node(name):
   global node_name
   node_name = name
 
-
 ###
 ### REQUEST
 ###
-def request(topic, id):
+def request(topic, selector):
   grpc_options=[('grpc.max_send_message_length', -1),
            ('grpc.max_receive_message_length', -1)]
+  print('a')
+  print('requesting on topic %s' % topic_to_rpc_url(topic))
   channel = grpc.insecure_channel(topic_to_rpc_url(topic),options=grpc_options)
+  print('b')
   asset_stub = HDF5_pb2_grpc.AssetStub(channel)
-  response = asset_stub.SayAsset(HDF5_pb2.AssetRequest(name=id))
+  print('c')
+  response = asset_stub.SayAsset(HDF5_pb2.AssetRequest(name=selector))
+  print('d')
   h5file = tables.open_file("in-memory-sample.h5", driver="H5FD_CORE",
                                 driver_core_image=response.message.decode('base64'),
                                 driver_core_backing_store=0)
@@ -82,7 +87,9 @@ class Producer(HDF5_pb2_grpc.AssetServicer):
 
   def start(self):
     HDF5_pb2_grpc.add_AssetServicer_to_server(self, self.grpc_server)
-    self.grpc_server.add_insecure_port(self.output_url)
+    while self.grpc_server.add_insecure_port(self.output_url) == 0:
+      logerr('Unable to assign address: %s' % self.output_url)
+      time.sleep(2)
     self.grpc_server.start()
     logdebug('output topic ready: %s' % self.output_topic)
     try:
@@ -129,8 +136,8 @@ class Prosumer(HDF5_pb2_grpc.AssetServicer):
 
     self.start()
 
-  # def ProduceOutput(self, request, context):
   def SayAsset(self, request, context):
+    print('1')
     im = self.GetInput(request.name)
     im = self.callback(im) # do user defined work
     h5single = tables.open_file("new_im.h5", "w", driver="H5FD_CORE",
@@ -138,10 +145,15 @@ class Prosumer(HDF5_pb2_grpc.AssetServicer):
     h5single.create_array(h5single.root, 'im', im)
     data = h5single.get_file_image().encode('base64')
     h5single.close()
+    print('3')
     return HDF5_pb2.AssetReply(message=data)
 
-  def GetInput(self, id):
-    response = self.InputGetter.SayAsset(HDF5_pb2.AssetRequest(name=id))
+  def GetInput(self, selector):
+    print('2')
+    req = HDF5_pb2.AssetRequest(name=selector)
+    print('2.1')
+    response = self.InputGetter.SayAsset(req)
+    print('2.2')
     h5file = tables.open_file("in-memory-sample.h5", driver="H5FD_CORE",
                                   driver_core_image=response.message.decode('base64'),
                                   driver_core_backing_store=0)
@@ -151,7 +163,9 @@ class Prosumer(HDF5_pb2_grpc.AssetServicer):
 
   def start(self):
     HDF5_pb2_grpc.add_AssetServicer_to_server(self, self.grpc_server)
-    self.grpc_server.add_insecure_port(self.output_url)
+    while self.grpc_server.add_insecure_port(self.output_url) == 0:
+      logerr('Unable to assign address: %s' % self.output_url)
+      time.sleep(2)
     self.grpc_server.start()
     logdebug('output topic ready: %s' % self.output_topic)
     try:

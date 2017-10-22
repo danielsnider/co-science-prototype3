@@ -1,8 +1,0 @@
-
-nodes:
-  name: viewer
-  package: builtin
-  inputs:
-    - user-supplied
-    - all
-

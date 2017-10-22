@@ -28,7 +28,7 @@ def run(pkg_info, node_config):
   # if '.py' in node_file:
   #   node_type = 'python'
 
-  cos_logging.loginfo('starting node: %s' % node_file)
+  cos_logging.logdebug('starting node: %s' % node_file)
   p = Popen(node_file)
   p.wait()
   

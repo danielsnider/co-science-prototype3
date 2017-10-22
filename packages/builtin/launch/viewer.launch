@@ -1,0 +1,10 @@
+
+nodes:
+
+- name: image loader
+  file: reader.py
+  package: builtin
+  outputs: 
+    - image
+  params: 
+    - input files: '/home/dan/imglib2-tutorials/images/*.tiff'
