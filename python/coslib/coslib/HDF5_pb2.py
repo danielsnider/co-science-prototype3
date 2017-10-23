@@ -19,7 +19,7 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   name='HDF5.proto',
   package='asset',
   syntax='proto3',
-  serialized_pb=_b('\n\nHDF5.proto\x12\x05\x61sset\"\x1c\n\x0c\x41ssetRequest\x12\x0c\n\x04name\x18\x01 \x01(\t\"\x1d\n\nAssetReply\x12\x0f\n\x07message\x18\x01 \x01(\t2=\n\x05\x41sset\x12\x34\n\x08SayAsset\x12\x13.asset.AssetRequest\x1a\x11.asset.AssetReply\"\x00\x42,\n\x16io.grpc.examples.assetB\nAssetProtoP\x01\xa2\x02\x03HLWb\x06proto3')
+  serialized_pb=_b('\n\nHDF5.proto\x12\x05\x61sset\" \n\x0c\x41ssetRequest\x12\x10\n\x08selector\x18\x01 \x01(\t\"\x1d\n\nAssetReply\x12\x0f\n\x07message\x18\x01 \x01(\t2=\n\x05\x41sset\x12\x34\n\x08GetAsset\x12\x13.asset.AssetRequest\x1a\x11.asset.AssetReply\"\x00\x42,\n\x16io.grpc.examples.assetB\nAssetProtoP\x01\xa2\x02\x03HLWb\x06proto3')
 )
 
 
@@ -33,7 +33,7 @@ _ASSETREQUEST = _descriptor.Descriptor(
   containing_type=None,
   fields=[
     _descriptor.FieldDescriptor(
-      name='name', full_name='asset.AssetRequest.name', index=0,
+      name='selector', full_name='asset.AssetRequest.selector', index=0,
       number=1, type=9, cpp_type=9, label=1,
       has_default_value=False, default_value=_b("").decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
@@ -52,7 +52,7 @@ _ASSETREQUEST = _descriptor.Descriptor(
   oneofs=[
   ],
   serialized_start=21,
-  serialized_end=49,
+  serialized_end=53,
 )
 
 
@@ -82,8 +82,8 @@ _ASSETREPLY = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=51,
-  serialized_end=80,
+  serialized_start=55,
+  serialized_end=84,
 )
 
 DESCRIPTOR.message_types_by_name['AssetRequest'] = _ASSETREQUEST
@@ -114,12 +114,12 @@ _ASSET = _descriptor.ServiceDescriptor(
   file=DESCRIPTOR,
   index=0,
   options=None,
-  serialized_start=82,
-  serialized_end=143,
+  serialized_start=86,
+  serialized_end=147,
   methods=[
   _descriptor.MethodDescriptor(
-    name='SayAsset',
-    full_name='asset.Asset.SayAsset',
+    name='GetAsset',
+    full_name='asset.Asset.GetAsset',
     index=0,
     containing_service=None,
     input_type=_ASSETREQUEST,
@@ -142,8 +142,8 @@ try:
 
 
   class AssetStub(object):
-    """The greeting service definition.
-    """
+    # missing associated documentation comment in .proto file
+    pass
 
     def __init__(self, channel):
       """Constructor.
@@ -151,20 +151,20 @@ try:
       Args:
         channel: A grpc.Channel.
       """
-      self.SayAsset = channel.unary_unary(
-          '/asset.Asset/SayAsset',
+      self.GetAsset = channel.unary_unary(
+          '/asset.Asset/GetAsset',
           request_serializer=AssetRequest.SerializeToString,
           response_deserializer=AssetReply.FromString,
           )
 
 
   class AssetServicer(object):
-    """The greeting service definition.
-    """
+    # missing associated documentation comment in .proto file
+    pass
 
-    def SayAsset(self, request, context):
-      """Sends a greeting
-      """
+    def GetAsset(self, request, context):
+      # missing associated documentation comment in .proto file
+      pass
       context.set_code(grpc.StatusCode.UNIMPLEMENTED)
       context.set_details('Method not implemented!')
       raise NotImplementedError('Method not implemented!')
@@ -172,8 +172,8 @@ try:
 
   def add_AssetServicer_to_server(servicer, server):
     rpc_method_handlers = {
-        'SayAsset': grpc.unary_unary_rpc_method_handler(
-            servicer.SayAsset,
+        'GetAsset': grpc.unary_unary_rpc_method_handler(
+            servicer.GetAsset,
             request_deserializer=AssetRequest.FromString,
             response_serializer=AssetReply.SerializeToString,
         ),
@@ -189,11 +189,11 @@ try:
     It is recommended to use the GA API (classes and functions in this
     file not marked beta) for all further purposes. This class was generated
     only to ease transition from grpcio<0.15.0 to grpcio>=0.15.0."""
-    """The greeting service definition.
-    """
-    def SayAsset(self, request, context):
-      """Sends a greeting
-      """
+    # missing associated documentation comment in .proto file
+    pass
+    def GetAsset(self, request, context):
+      # missing associated documentation comment in .proto file
+      pass
       context.code(beta_interfaces.StatusCode.UNIMPLEMENTED)
 
 
@@ -203,13 +203,13 @@ try:
     It is recommended to use the GA API (classes and functions in this
     file not marked beta) for all further purposes. This class was generated
     only to ease transition from grpcio<0.15.0 to grpcio>=0.15.0."""
-    """The greeting service definition.
-    """
-    def SayAsset(self, request, timeout, metadata=None, with_call=False, protocol_options=None):
-      """Sends a greeting
-      """
+    # missing associated documentation comment in .proto file
+    pass
+    def GetAsset(self, request, timeout, metadata=None, with_call=False, protocol_options=None):
+      # missing associated documentation comment in .proto file
+      pass
       raise NotImplementedError()
-    SayAsset.future = None
+    GetAsset.future = None
 
 
   def beta_create_Asset_server(servicer, pool=None, pool_size=None, default_timeout=None, maximum_timeout=None):
@@ -219,13 +219,13 @@ try:
     file not marked beta) for all further purposes. This function was
     generated only to ease transition from grpcio<0.15.0 to grpcio>=0.15.0"""
     request_deserializers = {
-      ('asset.Asset', 'SayAsset'): AssetRequest.FromString,
+      ('asset.Asset', 'GetAsset'): AssetRequest.FromString,
     }
     response_serializers = {
-      ('asset.Asset', 'SayAsset'): AssetReply.SerializeToString,
+      ('asset.Asset', 'GetAsset'): AssetReply.SerializeToString,
     }
     method_implementations = {
-      ('asset.Asset', 'SayAsset'): face_utilities.unary_unary_inline(servicer.SayAsset),
+      ('asset.Asset', 'GetAsset'): face_utilities.unary_unary_inline(servicer.GetAsset),
     }
     server_options = beta_implementations.server_options(request_deserializers=request_deserializers, response_serializers=response_serializers, thread_pool=pool, thread_pool_size=pool_size, default_timeout=default_timeout, maximum_timeout=maximum_timeout)
     return beta_implementations.server(method_implementations, options=server_options)
@@ -238,13 +238,13 @@ try:
     file not marked beta) for all further purposes. This function was
     generated only to ease transition from grpcio<0.15.0 to grpcio>=0.15.0"""
     request_serializers = {
-      ('asset.Asset', 'SayAsset'): AssetRequest.SerializeToString,
+      ('asset.Asset', 'GetAsset'): AssetRequest.SerializeToString,
     }
     response_deserializers = {
-      ('asset.Asset', 'SayAsset'): AssetReply.FromString,
+      ('asset.Asset', 'GetAsset'): AssetReply.FromString,
     }
     cardinalities = {
-      'SayAsset': cardinality.Cardinality.UNARY_UNARY,
+      'GetAsset': cardinality.Cardinality.UNARY_UNARY,
     }
     stub_options = beta_implementations.stub_options(host=host, metadata_transformer=metadata_transformer, request_serializers=request_serializers, response_deserializers=response_deserializers, thread_pool=pool, thread_pool_size=pool_size)
     return beta_implementations.dynamic_stub(channel, 'asset.Asset', cardinalities, options=stub_options)

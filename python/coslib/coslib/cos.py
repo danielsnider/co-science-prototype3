@@ -54,7 +54,7 @@ def request(topic, selector):
   logdebug('requesting on topic %s' % topic_to_rpc_url(topic))
   channel = grpc.insecure_channel(topic_to_rpc_url(topic),options=grpc_options)
   asset_stub = HDF5_pb2_grpc.AssetStub(channel)
-  response = asset_stub.SayAsset(HDF5_pb2.AssetRequest(name=selector))
+  response = asset_stub.GetAsset(HDF5_pb2.AssetRequest(selector=selector))
   if response.message == 'None':
     return
   h5file = tables.open_file("in-memory-sample.h5", driver="H5FD_CORE",
@@ -76,7 +76,7 @@ class Producer(HDF5_pb2_grpc.AssetServicer):
     self.grpc_server = grpc.server(futures.ThreadPoolExecutor(max_workers=self.num_workers))
     self.start()
 
-  def SayAsset(self, request, context):
+  def GetAsset(self, request, context):
     loginfo("Received request.")
     im = self.callback(request)
     h5single = tables.open_file("new_im.h5", "w", driver="H5FD_CORE",
@@ -137,8 +137,8 @@ class Prosumer(HDF5_pb2_grpc.AssetServicer):
 
     self.start()
 
-  def SayAsset(self, request, context):
-    im = self.GetInput(request.name)
+  def GetAsset(self, request, context):
+    im = self.GetInput(request.selector)
     im = self.callback(im) # do user defined work
     if im == None: # null callback
       return HDF5_pb2.AssetReply(message='None')
@@ -150,8 +150,8 @@ class Prosumer(HDF5_pb2_grpc.AssetServicer):
     return HDF5_pb2.AssetReply(message=data)
 
   def GetInput(self, selector):
-    req = HDF5_pb2.AssetRequest(name=selector)
-    response = self.InputGetter.SayAsset(req)
+    req = HDF5_pb2.AssetRequest(selector=selector)
+    response = self.InputGetter.GetAsset(req)
     h5file = tables.open_file("in-memory-sample.h5", driver="H5FD_CORE",
                                   driver_core_image=response.message.decode('base64'),
                                   driver_core_backing_store=0)

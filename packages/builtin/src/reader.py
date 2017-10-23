@@ -21,7 +21,7 @@ for i, filename in enumerate(glob.iglob('../images/*')):
   cos.loginfo('loaded image %s' % filename)
 
 def get_resource_callback(request):
-  return eval('h5file.root.%s' % request.name)
+  return eval('h5file.root.%s' % request.selector)
 
 if __name__ == '__main__':
   cos.init_node('reader')

@@ -5,8 +5,8 @@ import HDF5_pb2 as HDF5__pb2
 
 
 class AssetStub(object):
-  """The greeting service definition.
-  """
+  # missing associated documentation comment in .proto file
+  pass
 
   def __init__(self, channel):
     """Constructor.
@@ -14,20 +14,20 @@ class AssetStub(object):
     Args:
       channel: A grpc.Channel.
     """
-    self.SayAsset = channel.unary_unary(
-        '/asset.Asset/SayAsset',
+    self.GetAsset = channel.unary_unary(
+        '/asset.Asset/GetAsset',
         request_serializer=HDF5__pb2.AssetRequest.SerializeToString,
         response_deserializer=HDF5__pb2.AssetReply.FromString,
         )
 
 
 class AssetServicer(object):
-  """The greeting service definition.
-  """
+  # missing associated documentation comment in .proto file
+  pass
 
-  def SayAsset(self, request, context):
-    """Sends a greeting
-    """
+  def GetAsset(self, request, context):
+    # missing associated documentation comment in .proto file
+    pass
     context.set_code(grpc.StatusCode.UNIMPLEMENTED)
     context.set_details('Method not implemented!')
     raise NotImplementedError('Method not implemented!')
@@ -35,8 +35,8 @@ class AssetServicer(object):
 
 def add_AssetServicer_to_server(servicer, server):
   rpc_method_handlers = {
-      'SayAsset': grpc.unary_unary_rpc_method_handler(
-          servicer.SayAsset,
+      'GetAsset': grpc.unary_unary_rpc_method_handler(
+          servicer.GetAsset,
           request_deserializer=HDF5__pb2.AssetRequest.FromString,
           response_serializer=HDF5__pb2.AssetReply.SerializeToString,
       ),
