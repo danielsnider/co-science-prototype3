@@ -26,7 +26,7 @@ def display_image(im):
 
 if __name__ == '__main__':
   cos.init_node('viewer')
-  cos.consumer(In='image', cb=display_image)
+  cos.consumer(In='image.filter.gaussian', cb=display_image)
   try:
     cos.spin()
   except KeyboardInterrupt:

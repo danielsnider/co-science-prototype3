@@ -1,14 +1,17 @@
 import os
 import tables
-
+import cos
 
 class CacheService():
   def __init__(self, node_name, pkg_info, hdf5_path=None):
     self.work_dir = '.'
     self.hdf5_path = hdf5_path or os.path.join(self.work_dir,'%s_cache.h5' % node_name)
-    self.hdf5_file = tables.open_file(self.hdf5_path,'w') # TEST: does not overwrite existing?
+    self.hdf5_file = tables.open_file(self.hdf5_path,'a') # TEST: does not overwrite existing?
     self.group_name = 'ver_%s' % pkg_info['src_sha']
-    self.group = self.hdf5_file.create_group('/', self.group_name, 'Cache')
+    try:
+      self.group = self.hdf5_file.create_group('/', self.group_name, 'Cache')
+    except tables.exceptions.NodeError:
+      pass
 
   def lookup_mem_hdf5(self, request):
     # NOT IMPLEMENTED
@@ -32,6 +35,8 @@ class CacheService():
 
   def insert_cache_entry(self, request, result):
     where = '/%s' % self.group_name
+    if result.__class__ is tables.array.Array:
+      result = result.read()
     self.hdf5_file.create_array(where, request, result)
     self.hdf5_file.flush()
 
