@@ -67,8 +67,8 @@ def _launch(launch_file,this_package,pkg_info):
     selector = action[topic]
     cos.loginfo('Requesting %s on topic %s' % (selector, topic))
     im = cos.request(topic,selector)
-    print 'im.__class__'
-    print im.__class__
+  if actions:
+    cos.loginfo('Finished executing actions.')
 
   try:
     while True:

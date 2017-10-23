@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
-import sys
-sys.path.append('/home/dan/co-science-prototype3/python')
+# import sys
+# sys.path.append('/home/dan/co-science-prototype3/python')
 import os
 import skimage
 import skimage.io
@@ -21,7 +21,6 @@ for i, filename in enumerate(glob.iglob('../images/*')):
   cos.loginfo('loaded image %s' % filename)
 
 def get_resource_callback(request):
-  print('reeeeaad')
   return eval('h5file.root.%s' % request.name)
 
 if __name__ == '__main__':

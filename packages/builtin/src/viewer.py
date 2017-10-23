@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
-import sys
-sys.path.append('/home/dan/co-science-prototype3/python')
+# import sys
+# sys.path.append('/home/dan/co-science-prototype3/python')
 import tables
 import numpy as np
 from coslib.coslib import cos
@@ -14,6 +14,7 @@ def display_image(im):
   plt.imshow(im)
   plt.show(block=False)
   plt.waitforbuttonpress()
+  plt.close()
 
 # USAGE EXAMPLE
 # $ python viewer.py TOPIC IMG_ID
