@@ -1,7 +1,5 @@
 import cos_cache as c
-pkg_info  = {
-  'src_sha': 'eontue9u409'
-}
+pkg_info  = {'src_sha': 'eontue9u409'}
 
 cs = c.CacheService('my_node',pkg_info)
 cs.lookup('cat')

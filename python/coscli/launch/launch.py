@@ -20,7 +20,8 @@ def _launch(launch_file,this_package,pkg_info):
   launch_config = yaml.load(file(launch_file, 'r'))
   launch_name = os.path.basename(launch_file)
   nodes = launch_config['nodes'] if 'nodes' in launch_config else []
-
+  if nodes == None:
+    nodes = []
 
   # TODO jinja and cli args
 

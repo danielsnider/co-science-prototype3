@@ -4,6 +4,7 @@ import cos
 
 class CacheService():
   def __init__(self, node_name, pkg_info, hdf5_path=None):
+    self.file_is_empty = True
     self.work_dir = '.'
     self.hdf5_path = hdf5_path or os.path.join(self.work_dir,'%s_cache.h5' % node_name)
     self.hdf5_file = tables.open_file(self.hdf5_path,'a') # TEST: does not overwrite existing?
@@ -35,11 +36,16 @@ class CacheService():
 
   def insert_cache_entry(self, request, result):
     where = '/%s' % self.group_name
-    if result.__class__ is tables.array.Array:
-      result = result.read()
-    self.hdf5_file.create_array(where, request, result)
+    key = request
+    value = result
+    cos.loginfo('value.__class__')
+    cos.loginfo(value.__class__)
+    self.hdf5_file.create_array(where, key, value)
     self.hdf5_file.flush()
+    self.file_is_empty = False
 
   def close(self):
     self.hdf5_file.close()
+    if self.file_is_empty:
+      os.remove(self.hdf5_path)
 

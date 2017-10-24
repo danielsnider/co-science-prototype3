@@ -31,3 +31,4 @@ if __name__ == '__main__':
   except KeyboardInterrupt:
     h5file.close()
     cos.loginfo('exiting reader')
+
