@@ -76,10 +76,13 @@ def request(topic, selector):
     im = hdf5_response_to_im(response)
     return im
   except grpc._channel._Rendezvous as e:
+    global node_name
+    logerr('Error in node: %s' % node_name)
     err_msg = e._state.details.split('Exception calling application: ')[-1]
     logerr('No result returned because node (WHICH? should include when error message is generated) had an error: %s'% err_msg)
     if err_msg == 'Connect Failed':
       logerr("Is the rode running and reachable on its assigned address of %s?" % topic_url)
+    raise e
   except Exception as e:
     global node_name
     logerr('Error in node: %s' % node_name)

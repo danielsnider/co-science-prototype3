@@ -1,13 +1,13 @@
 
 nodes:
 
-#- name: image loader
-#  file: reader.py
-#  package: builtin
-#  outputs: 
-#    - image
-#  params: 
-#    - input files: '/home/dan/imglib2-tutorials/images/*.tiff'
+- name: image loader
+  file: reader.py
+  package: builtin
+  outputs: 
+    - image
+  params: 
+    - input files: '/home/dan/imglib2-tutorials/images/*.tiff'
 #
 #- name: filters
 #  file: filter.py
@@ -31,7 +31,7 @@ nodes:
 actions:
 
   - image:
-    - 'im0'
+    - 'im1'
 
 
 # actions:

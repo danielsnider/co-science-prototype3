@@ -1,15 +1,30 @@
+import sys
 import click
 
 from coslib.coslib import cos_packages
 from coslib.coslib import cos_logging
-from subprocess import Popen
+import subprocess
 
 
-# import subprocess
-# from subprocess import Popen, PIPE
-# p = Popen(cmd, stdout=PIPE, stderr=PIPE)
-# stdout, stderr = p.communicate()
 
+# def execute(command):
+#     process = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+
+#     # Poll process for new output until finished
+#     while True:
+#         nextline = process.stdout.readline()
+#         if nextline == '' and process.poll() is not None:
+#             break
+#         sys.stdout.write('+EXECUTE output: %s' % nextline)
+#         sys.stdout.flush()
+
+#     output = process.communicate()[0]
+#     exitCode = process.returncode
+
+#     if (exitCode == 0):
+#         return output
+#     else:
+#         raise ProcessException(command, exitCode, output)
 
 def run(pkg_info, node_config):
   # EXample input (Oct 21, 2017)
@@ -29,7 +44,10 @@ def run(pkg_info, node_config):
   #   node_type = 'python'
 
   cos_logging.logdebug('starting node: %s' % node_file)
-  p = Popen(node_file)
+
+    # execute(node_file)
+
+  p = subprocess.Popen(node_file)
   p.wait()
   
   # check available ports
