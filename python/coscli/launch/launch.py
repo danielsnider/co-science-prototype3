@@ -75,7 +75,7 @@ def _launch(launch_file,this_package,pkg_info):
     thread.start()
 
   ## ACTIONS
-  time.sleep(5) # TODO: Wait till everything has started and is ready
+  time.sleep(2) # TODO: Wait till everything has started and is ready
   actions = launch_config['actions'] if 'actions' in launch_config else []
   for action in actions:
     cos.init_node('Cos Launch Action Executor')

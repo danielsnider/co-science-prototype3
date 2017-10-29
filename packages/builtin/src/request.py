@@ -1,7 +1,5 @@
 #!/usr/bin/env python
 
-import sys
-sys.path.append('/home/dan/co-science-prototype3/python')
 from coslib.coslib import cos
 
 

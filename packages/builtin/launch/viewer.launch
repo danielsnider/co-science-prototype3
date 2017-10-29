@@ -1,10 +1,15 @@
 
 nodes:
 
-- name: image loader
-  file: reader.py
+- name: special_viewer
+  file: special_viewer.py
   package: builtin
-  outputs: 
-    - image
-  params: 
-    - input files: '/home/dan/imglib2-tutorials/images/*.tiff'
+  inputs: 
+    - image: gaus
+  params:
+
+
+actions:
+
+  - viewer_trigger:
+    - im0

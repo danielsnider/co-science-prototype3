@@ -28,8 +28,8 @@ nodes:
   output:
     - image.segmentation.watershed
 
-- name: viewer
-  file: viewer.py
+- name: special_viewer
+  file: special_viewer.py
   package: builtin
   inputs: 
     - image: gaus
@@ -41,22 +41,3 @@ actions:
   - viewer_trigger:
     - im0
 
-
-# actions:
-# - topic: viewer_trigger
-# - selector: eoi
-# - selector: eouo
-# 
-# one of each type
-# every nth
-# first n
-# last n
-# n:m
-# n
-# 
-# plate
-# column
-# row
-# field 
-# timepoint
-# z

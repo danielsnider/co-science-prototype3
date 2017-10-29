@@ -1,0 +1,48 @@
+
+  - viewer_trigger
+    - *
+    - first
+
+  - create_rgb_overlay: 
+    to: rgb_overlay
+    from:
+      - images(_filter: [_one_per:experiment, timepoint:1, rows:10:2:20, columns:end-2:end]):
+        - labelled: image.segmentation.watershed
+        - original: image
+        - well_id
+        - experiment name
+        - filename
+        - animal name
+        - cell count
+      - date(_argument:now)
+
+
+query ImageLabelDate {
+  image: data(experiment: 'one_per') {
+    original: image
+    label: image.segmentation.watershed
+  }
+  date
+}
+
+
+
+
+# actions:
+# - topic: viewer_trigger
+# - selector: eoi
+# - selector: eouo
+# 
+# one of each type
+# every nth
+# first n
+# last n
+# n:m
+# n
+# 
+# plate
+# column
+# row
+# field 
+# timepoint
+# z
