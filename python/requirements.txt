@@ -7,3 +7,5 @@ tables
 pyyaml
 glob2
 requests
+matplotlib
+mahotas

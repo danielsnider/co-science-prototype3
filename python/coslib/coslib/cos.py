@@ -39,6 +39,7 @@ def topic_to_rpc_url(topic):
     'image.filter.gaussian': 'localhost:50052',
     'gaus': 'localhost:50052',
     'image.filter.laplace': 'localhost:50053',
+    'image.segmentation.watershed': 'localhost:50055',
     'viewer_trigger': 'localhost:50054'
   }
   return mapping[topic]
@@ -173,8 +174,10 @@ class Node(HDF5_pb2_grpc.AssetServicer):
       self.stop()
 
   def stop(self):
-    self.cache.close()
-    self.grpc_server.stop(0) # This exits the process immediately and so must be last
+    if hasattr(self, 'cache'):
+      self.cache.close()
+    if hasattr(self, 'grpc_server'):
+      self.grpc_server.stop(0) # This exits the process immediately and so must be last
 
 
 ###

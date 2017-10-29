@@ -36,8 +36,7 @@ def run(pkg_info, node_config):
   node_file =  [n for n in pkg_info['nodes'] if node_config['file'] in n]
 
   if not node_file:
-    click.secho('Error: node file not found', fg='red')
-    click.secho(node_config['file'], fg='red')
+    click.secho('Error executing node "%s" because file "%s" was not found in "src" folder for package "%s" or file is not executable.' % (node_config['name'], node_config['file'], pkg_info['name']), fg='red')
     return
 
   # if '.py' in node_file:
@@ -47,8 +46,14 @@ def run(pkg_info, node_config):
 
     # execute(node_file)
 
-  p = subprocess.Popen(node_file)
-  p.wait()
+  try:
+    p = subprocess.Popen(node_file)
+    p.wait()
+  except OSError as e:
+    # print vars(e)
+    if '[Errno 8] Exec format error' in e.child_traceback:
+      click.secho("Error hint: the following error occured and may be because you don't have a '#!/usr/bin/env' shebang line at the top of your file '%s'" % node_file, fg='red')
+    raise e
   
   # check available ports
   #   curl http://localhost:8500/v1/catalog/node/laptop

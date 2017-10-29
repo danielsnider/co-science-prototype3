@@ -5,13 +5,17 @@ import click
 
 from hashlib import sha1
 
+def get_package_paths():
+  conf = yaml.load(file('/etc/cos/config.yaml', 'r'))
+  return conf['package paths']
+
 def collect_package_info():
   # TODO: Don't GLOB 3 times each loop, do it once?
   # TODO: Print warning if too many files detected and slowdown occurs
   # print('searching for packages')
-  conf = yaml.load(file('/etc/cos/config.yaml', 'r'))
+  pkg_paths = get_package_paths()
   packages = []
-  for pkg_path in conf['package paths']:
+  for pkg_path in pkg_paths:
     for pkg_conf_file in glob2.glob('%s/**/*cos-package.yaml' % pkg_path, recursive=True):
       found_pkg_path = os.path.dirname(pkg_conf_file) # found a folder with the correct yaml
       pkg = yaml.load(file(pkg_conf_file, 'r'))

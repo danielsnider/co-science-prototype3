@@ -20,6 +20,14 @@ nodes:
   params: 
     - sigma: 4
 
+- name: segment_nuc
+  file: watershed_nuc.py
+  package: segmentation
+  input: 
+    - image
+  output:
+    - image.segmentation.watershed
+
 - name: viewer
   file: viewer.py
   package: builtin
@@ -31,8 +39,7 @@ nodes:
 actions:
 
   - viewer_trigger:
-    - 'im0'
-    - 'im0'
+    - im0
 
 
 # actions:

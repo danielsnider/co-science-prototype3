@@ -23,6 +23,8 @@ def _launch(launch_file,this_package,pkg_info):
   if nodes == None:
     nodes = []
 
+
+
   # TODO jinja and cli args
 
   print('\nLAUNCH SUMMARY')
@@ -33,14 +35,26 @@ def _launch(launch_file,this_package,pkg_info):
   #   return
   print('\nPARAMETERS\n')
   for node in nodes:
+    node['params'] = node['params'] if 'params' in node else []
+    if node['params'] == None:
+      node['params'] = []
     if node['params']:
       for param in node['params']:
         for key, value in param.iteritems():
           print(' * /%s: %s' % (key,value))
-  print('\nNODES\n')
+  print('\nNODES (PACKAGE/FILE)\n')
   for node in nodes:
     print(' - %s (%s/%s)' % (node['name'],node['package'],node['file']))
   print('\n')
+
+  # Pre-check that requested packages can be found
+  for node in nodes:
+    try:
+      pkg = [pkg for pkg in pkg_info if pkg['name'] == node['package']][0]
+    except IndexError:
+      pkg_paths = cos_packages.get_package_paths()
+      click.secho('Package "%s" not found. Does a "cos-package.yaml" exist for this package in the COS search paths? Search paths: "%s"' % (node['package'],pkg_paths), fg='red')
+      return
 
   for node in nodes:
     pkg = [pkg for pkg in pkg_info if pkg['name'] == node['package']][0]
