@@ -23,10 +23,13 @@ for i, filename in enumerate(glob.iglob('../images/*')):
 
 def get_resource_callback(request):
   try:
-    return eval('h5file.root.%s' % request.selector)
+    im = eval('h5file.root.%s' % request.selector)
+    return im.read()
   except tables.exceptions.NoSuchNodeError as e:
-    cos.logerr('Could not find image with id "%s"' % request.selector)
-    cos.logerr('I have available\n%s' % h5file.list_nodes('/root'))
+    err_msg = 'Could not find image with id "%s"' % request.selector
+    cos.logerr(err_msg)
+    cos.logerr('I have available\n%s' % h5file.list_nodes('/'))
+    raise Exception(err_msg)
 
 if __name__ == '__main__':
   cos.init_node('reader')

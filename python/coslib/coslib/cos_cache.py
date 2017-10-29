@@ -25,6 +25,8 @@ class CacheService():
       node = self.hdf5_file.get_node(node_name)
       return node
     except tables.exceptions.NoSuchNodeError:
+      cos.logdebug('[CACHE] Could not find cache entry at node named "%s"' % node_name)
+      cos.logdebug('[CACHE] I have available\n%s' % self.hdf5_file.list_nodes('/'))
       return None
 
   def lookup(self, request):

@@ -77,12 +77,11 @@ def request(topic, selector):
     return im
   except grpc._channel._Rendezvous as e:
     global node_name
-    logerr('Error in node: %s' % node_name)
     err_msg = e._state.details.split('Exception calling application: ')[-1]
-    logerr('No result returned because node (WHICH? should include when error message is generated) had an error: %s'% err_msg)
+    logerr('Error in node: %s. Message: "%s"' % (node_name,err_msg))
     if err_msg == 'Connect Failed':
       logerr("Is the rode running and reachable on its assigned address of %s?" % topic_url)
-    raise e
+    # raise e   # Don't raise a stacktrace here, it wasn't us, it was the other node
   except Exception as e:
     global node_name
     logerr('Error in node: %s' % node_name)
@@ -120,8 +119,14 @@ class Node(HDF5_pb2_grpc.AssetServicer):
       return HDF5_pb2.AssetReply(message='None')
     data = self.cache.lookup(request.selector) # TODO: allow returning None as a valid cache hit result
     if data:
-      logdebug("cache hit for request %s" % request)
+      h5single = tables.open_file("new_im.h5", "w", driver="H5FD_CORE",
+                                driver_core_backing_store=0)
+      h5single.create_array(h5single.root, 'im', data.read())
+      data = h5single.get_file_image().encode('base64')
+      h5single.close()
       return HDF5_pb2.AssetReply(message=data)
+    else:
+      logdebug("[CACHE] miss for request %s" % request)
     if self.node_type == 'producer':
       # Access new data and return it to the requester
       im = self.DoUserCallback(request)
@@ -135,7 +140,7 @@ class Node(HDF5_pb2_grpc.AssetServicer):
     h5single.create_array(h5single.root, 'im', im)
     data = h5single.get_file_image().encode('base64')
     h5single.close()
-    # self.cache.insert_cache_entry(request.selector, data)
+    self.cache.insert_cache_entry(request.selector, data)
     return HDF5_pb2.AssetReply(message=data)
 
   def GetDataFromInputTopic(self, selector):
