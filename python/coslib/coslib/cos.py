@@ -62,6 +62,15 @@ def spin():
   while True:
     time.sleep(_ONE_DAY_IN_SECONDS)
 
+
+
+topics = []
+def close():
+  global topics
+  for topic in topics:
+    topic.stop()
+
+
 ###
 ### REQUEST
 ###
@@ -80,7 +89,7 @@ def request(topic, selector):
     err_msg = e._state.details.split('Exception calling application: ')[-1]
     logerr('Error in node: %s. Message: "%s"' % (node_name,err_msg))
     if err_msg == 'Connect Failed':
-      logerr("Is the rode running and reachable on its assigned address of %s?" % topic_url)
+      logerr("Is the rode running? Is it reachable on its assigned address of '%s'?" % topic_url)
     # raise e   # Don't raise a stacktrace here, it wasn't us, it was the other node
   except Exception as e:
     global node_name
@@ -94,6 +103,8 @@ class Node(HDF5_pb2_grpc.AssetServicer):
   def __init__(self, params, callback):
     try:
       global node_name
+      global topics
+      topics.append(self)
       self.DoUserCallback = callback
       self.node_type = params['node_type']
       if not self.node_type == 'producer': # Producers have no input topic
@@ -109,6 +120,7 @@ class Node(HDF5_pb2_grpc.AssetServicer):
       self.start()
     except Exception as e:
       logerr('Error in node: %s' % node_name)
+      self.stop()
       raise e
 
   def GetAsset(self, request, context):
@@ -125,8 +137,6 @@ class Node(HDF5_pb2_grpc.AssetServicer):
       data = h5single.get_file_image().encode('base64')
       h5single.close()
       return HDF5_pb2.AssetReply(message=data)
-    else:
-      logdebug("[CACHE] miss for request %s" % request)
     if self.node_type == 'producer':
       # Access new data and return it to the requester
       im = self.DoUserCallback(request)
@@ -140,7 +150,7 @@ class Node(HDF5_pb2_grpc.AssetServicer):
     h5single.create_array(h5single.root, 'im', im)
     data = h5single.get_file_image().encode('base64')
     h5single.close()
-    self.cache.insert_cache_entry(request.selector, data)
+    self.cache.insert_cache_entry(request.selector, im)
     return HDF5_pb2.AssetReply(message=data)
 
   def GetDataFromInputTopic(self, selector):
@@ -209,5 +219,6 @@ def start_node_thread(params, cb):
   try:
     thread.start()
   except KeyboardInterrupt:
+    cos.logdebug('sart() STOP pass')
     pass
 

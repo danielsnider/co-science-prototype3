@@ -1,7 +1,5 @@
 #!/usr/bin/env python
 
-# import sys
-# sys.path.append('/home/dan/co-science-prototype3/python')
 import tables
 import numpy as np
 from coslib.coslib import cos
@@ -10,9 +8,6 @@ from matplotlib import pyplot as plt
 plt.ion()
 def display_image(im):
   cos.loginfo('displaying image!')
-  from IPython import embed
-
-  embed() # drop into an IPython session
   plt.clf()
   plt.imshow(im)
   plt.show(block=False)
@@ -34,3 +29,4 @@ if __name__ == '__main__':
     cos.spin()
   except KeyboardInterrupt:
     cos.loginfo('exiting viewer')
+    cos.close()

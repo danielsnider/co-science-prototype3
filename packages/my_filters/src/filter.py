@@ -22,4 +22,5 @@ if __name__ == '__main__':
   try:
     cos.spin()
   except KeyboardInterrupt:
+    cos.close()
     cos.loginfo('exiting filter')

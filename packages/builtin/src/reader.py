@@ -37,6 +37,7 @@ if __name__ == '__main__':
   try:
     cos.spin()
   except KeyboardInterrupt:
-    h5file.close()
     cos.loginfo('exiting reader')
+    h5file.close()
+    cos.close()
 
