@@ -48,12 +48,12 @@ actions:
 
   - topic: special_viewer_trigger # feature 2 (advanced select)
     select:
-    - animal name: ['squirl', 'mouse']
-      row: '1:10:100'
+    - row: '1:10:100'
       column: first
       field: last
-      range: '2:3'
+      animal name: ['squirl', 'mouse']
       experiment: one_each
+      quality: '>90'
 
     - id: im0
 

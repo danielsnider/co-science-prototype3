@@ -13,21 +13,23 @@ h5file = tables.open_file("new_sample.h5", "w", driver="H5FD_CORE",
 
 i = 0
 for filename in glob.iglob('../images/*'):
+  # Load
   if os.path.isdir(filename):
     continue
   im = skimage.io.imread(filename)
-  Row-column-field-channel-(sk)timepoint
 
+  # Create hdf5
+  array_name = "im%s" % i # eg. im1, im2, etc.
+  arr = h5file.create_array(h5file.root, array_name, im)
 
+  # Add metadata
   name = 'r02c02f06p01-ch3sk74fk1fl1.tif'
   exp = re.compile('r(?P<row>\d+)c(?P<column>\d+)f(?P<field>\d+)p(?P<plate>\d+)-ch(?P<channal>\d+)sk(?P<time>\d+)')
   r=exp.search(name)
   filename_dict = r.groupdict()
-
-
-  array_name = "im%s" % i # eg. im1, im2, etc.
-  arr = h5file.create_array(h5file.root, array_name, im)
-  arr._f_setattr('key','val')
+  for key, value in filename_dict.iteritems():
+    arr._f_setattr(key,value)
+  
   cos.loginfo('loaded image %s to array_name "%s"' % (filename, array_name))
   i+=1
 

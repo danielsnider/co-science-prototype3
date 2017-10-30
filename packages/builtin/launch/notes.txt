@@ -194,3 +194,31 @@ package: my_filters
   }
 
 
+
+late selector data (Example: image quality)
+
+image
+watershed
+
+1. find selector fields not in input nodes
+2. ask special selector nodes to resolve requirement to list of ids
+3. append special ids to selector and send to node with basic selector support
+
+(favorite)
+1. send select stream to basic node
+2. check cache (how to check for stream?)
+3. get list of data IDs at time of request filtered by basic select query
+4. for each data ID, check with special selector nodes and responds with data if it passes
+    get_experiment_info_for_image
+    get_animal_name_for_image
+    get_quality_for_image
+
+
+
+selectors go through every node during stream initialization until it goes all the way
+up the web of nodes until it reaches the authorities on the request, whom start producing
+the data according to the selector and subsequent nodes compute their results.
+
+
+1. use a big centralized database
+
