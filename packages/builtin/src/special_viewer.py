@@ -28,18 +28,7 @@ def display_image(image):
 if __name__ == '__main__':
   cos.init_node('viewer')
 
-  input_map = {
-    'images': [{
-      'labelled': 'image.segmentation.watershed',
-      'original': 'image'
-      'date':'image.meta.date',
-      'file name':'image.meta.file name',
-      'animal name':'image.meta.animal name',
-    }],
-    'date': 'date'
-  }
-
-  cos.consumer(In='image', cb=display_image)
+  cos.consumer(In=['image','image.segmentation.watershed'], cb=display_image)
   try:
     cos.spin()
   except KeyboardInterrupt:

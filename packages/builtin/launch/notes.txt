@@ -1,3 +1,21 @@
+Package oriented 
+----------------
+
+packages:
+  - builtin:
+     params:
+     nodes:
+      - name: image loader
+        params: val
+        
+  - builtin2:
+     params:
+     nodes:
+      - name: image loader
+        params: val
+        
+
+
 
   - viewer_trigger
     - *
@@ -26,6 +44,39 @@ query ImageLabelDate {
 }
 
 
+Multiple output from node?
+
+image raw
+filename
+animal name
+
+
+options
+multiple fields on data output from topic (yes) (no: multiple output topics)
+num columns could always grow?
+
+multiple optional output or grouped output
+
+
+
+
+Multiple selectors?
+too many combinations? no just do it
+
+input_map = {
+  'images': [{
+    'labelled': 'image.segmentation.watershed',
+    'original': 'image'
+  }],
+  'images': [{
+    'labelled': 'image.segmentation.watershed',
+    'original': 'image'
+  }],
+  'date': 'date'
+}
+
+
+Aspect oriented functions?
 
 
 # actions:
@@ -46,3 +97,100 @@ query ImageLabelDate {
 # field 
 # timepoint
 # z
+
+
+OLD ALL.LAUNCH
+
+nodes:
+
+- name: image loader
+  file: reader.py
+  package: builtin
+  outputs: 
+    - image
+  params: 
+    - input files: '/home/dan/imglib2-tutorials/images/*.tiff'
+
+- name: filters
+  file: filter.py
+  package: my_filters
+  input: 
+    - image
+  output:
+    - image.filter.gaussian: gaus
+    - image.filter.laplace
+  params: 
+    - sigma: 4
+
+- name: segment_nuc
+  file: watershed_nuc.py
+  package: segmentation
+  input: 
+    - image
+  output:
+    - image.segmentation.watershed
+
+- name: rgb_overlay
+  file: special_viewer.py
+  package: builtin
+  inputs: 
+    - image
+    - image.segmentation.watershed
+  params:
+
+
+actions:
+
+  - viewer_trigger:
+    - im0
+
+
+
+NEW ALL.LAUNCH
+
+nodes:
+
+- name: image loader
+  file: reader.py
+  package: builtin
+  outputs: 
+    - to: image
+      fields:      
+        - original
+        - filename
+        
+package: my_filters
+- name: filters
+  file: filter.py  
+  input: 
+    - from: image
+  output:
+    - from: image.filter.gaussian
+      to: gaus
+      fields:
+       - image
+       - filename
+    - from: image.filter.laplace
+      to: gaus
+      fields: 
+        - filename
+        - animal_name: animalname
+
+
+  input_map = {
+    'images': [{
+      'labelled': 'image.segmentation.watershed',
+      'original': 'image'
+      'date':'image.meta.date',
+      'file name':'image.meta.file name',
+      'animal name':'image.meta.animal name',
+      'animal name':'image.meta',
+    }],
+    'art': [{
+      'image': 'art.image'
+      'style': 'art.style'
+    }]
+    'date': 'date'
+  }
+
+

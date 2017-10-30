@@ -5,7 +5,14 @@ nodes:
   file: reader.py
   package: builtin
   outputs: 
-    - image
+    - to: image
+      fields:
+        - original
+        - filename
+        - row
+        - column
+        - field
+        - plate
   params: 
     - input files: '/home/dan/imglib2-tutorials/images/*.tiff'
 
@@ -28,16 +35,25 @@ nodes:
   output:
     - image.segmentation.watershed
 
-- name: special_viewer
+- name: rgb_overlay
   file: special_viewer.py
   package: builtin
   inputs: 
-    - image: gaus
-  params:
+    - image
+    - image.segmentation.watershed # feature 1 (two inputs)
+
 
 
 actions:
 
-  - viewer_trigger:
-    - im0
+  - topic: special_viewer_trigger # feature 2 (advanced select)
+    select:
+    - animal name: ['squirl', 'mouse']
+      row: '1:10:100'
+      column: first
+      field: last
+      range: '2:3'
+      experiment: one_each
+
+    - id: im0
 

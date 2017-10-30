@@ -4,6 +4,13 @@ nodes:
   file: reader.py
   package: builtin
   outputs: 
-    - image
+    - to: image
+      fields:
+        - original
+        - filename
+        - row
+        - column
+        - field
+        - plate
   params: 
     - input files: '/home/dan/imglib2-tutorials/images/*.tiff'

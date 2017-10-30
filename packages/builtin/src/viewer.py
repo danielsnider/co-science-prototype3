@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 
-import tables
 import numpy as np
 from coslib.coslib import cos
 from matplotlib import pyplot as plt
