@@ -200,7 +200,9 @@ late selector data (Example: image quality)
 image
 watershed
 
-1. find selector fields not in input nodes
+give selector to each or to top authority
+
+1. find selector fields not in basic input nodes
 2. ask special selector nodes to resolve requirement to list of ids
 3. append special ids to selector and send to node with basic selector support
 

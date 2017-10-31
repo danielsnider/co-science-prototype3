@@ -6,12 +6,12 @@ nodes:
   package: builtin
   outputs: 
     - to: image
-      fields:
+      data:
         - original
-        - filename
-        - row
-        - column
-        - field
+        - filename 
+        - row *
+        - column *
+        - field *
         - plate
   params: 
     - input files: '/home/dan/imglib2-tutorials/images/*.tiff'
@@ -41,7 +41,76 @@ nodes:
   inputs: 
     - image
     - image.segmentation.watershed # feature 1 (two inputs)
+  outputs:
+    - image.rgb_overlay
 
+- name: image quality
+  file: image_quality.py
+  package: builtin
+  inputs: 
+    - image
+  outputs:
+    - image.quality * 
+  params:
+    - output filters:
+      - quality: '>90' # (anti-selector pattern)
+
+- name: file to animal name map
+  file: animal_name_map.py
+  package: builtin
+  inputs: 
+    - image.filename
+  outputs:
+    - image.animal * 
+  params:
+    - output filters:
+      - quality: '>90' # (anti-selector pattern)
+
+- name: experiment list
+  file: plate_map.py
+  package: builtin
+  inputs: 
+    - image.filename 
+  outputs:
+    - to: plate_map or experiment?
+      fields:
+        - doses
+        - cell line
+        - x
+        - y
+
+  params:
+    - output filters:
+      - quality: '>90' # (anti-selector pattern)
+
+- name: stats
+  file: builtin.py
+  package: builtin
+  inputs: 
+    - image
+    - image.segmentation.watershed
+  params:
+#    - output filters:
+#      - area: '100<x<1000' # to be saved but not given out (anti-selector pattern)
+#        solidity: '<0.7'
+#        edge score: '>80'
+
+- name: 2d plots
+  file: 2d.py
+  package: plots
+  inputs: 
+    - stats
+  outputs:
+    - scatter plot
+    - binned plot
+  params:
+    - aspects:
+      - x: 'cell_mass'
+        y: 'STRADa_nuc'
+        title: 'Cell Mass vs STRADa nuc'
+      - x: 'cell_mass'
+        y: 'STRADa_cyto'
+        title: 'Cell Mass vs STRADa cyto'
 
 
 actions:
@@ -54,6 +123,28 @@ actions:
       animal name: ['squirl', 'mouse']
       experiment: one_each
       quality: '>90'
-
     - id: im0
 
+  - topic: stats
+    select:
+    - area: '100<x<1000' # or should these be params?
+      solidity: '1:10:100'
+      edge score: '1:10:100'
+
+  - topic: plotter
+    select: '*'
+    with params:
+      - aspects:
+        - x: 'cell_mass'
+          y: 'STRADa_nuc'
+          title: 'Cell Mass vs STRADa nuc'
+        - x: 'cell_mass'
+          y: 'STRADa_cyto'
+          title: 'Cell Mass vs STRADa cyto'
+
+
+
+aspects? as actions or params? as params or actions!
+output filter vs selector? selector seems easier
+benchmarks? optimization? LETS SEE GO NUTS
+What to do,2 EXPERIMENT INFO vs PLATE MAP?
