@@ -1,0 +1,42 @@
+nodes:
+
+- name: image loader
+  file: reader.py
+  package: builtin
+  outputs: 
+    - image
+  params: 
+    - input files: '/home/dan/imglib2-tutorials/images/*.tiff'
+
+- name: filters
+  file: filter.py
+  package: my_filters
+  input: 
+    - image
+  output:
+    - image.filter.gaussian: gaus
+    - image.filter.laplace
+  params: 
+    - sigma: 4
+
+- name: segment_nuc
+  file: watershed_nuc.py
+  package: segmentation
+  input: 
+    - image
+  output:
+    - image.segmentation.watershed
+
+- name: viewer
+  file: viewer.py
+  package: builtin
+  inputs: 
+    - image.segmentation.watershed
+  params:
+
+
+actions:
+
+  - viewer_trigger:
+    - im0
+
