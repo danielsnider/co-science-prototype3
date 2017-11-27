@@ -3,12 +3,18 @@
 import numpy as np
 from coslib.coslib import cos
 from matplotlib import pyplot as plt
+import matplotlib.patheffects as path_effects
+
 
 plt.ion()
 def display_image(im):
   cos.loginfo('displaying image!')
   plt.clf()
   plt.imshow(im)
+  text=plt.text(im.shape[1]/2, im.shape[0]-100, 'some text', color='white',
+                          ha='center', va='center') # position bottom middle
+  text.set_path_effects([path_effects.Stroke(linewidth=3, foreground='black'),
+                       path_effects.Normal()])
   plt.show(block=False)
   plt.waitforbuttonpress()
   plt.close()
