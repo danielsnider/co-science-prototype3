@@ -40,16 +40,7 @@ class CacheService():
 
   def insert_cache_entry(self, request, result):
     where = '/%s' % self.group_name
-    # key = request
-    # from IPython import embed
-    # embed() # drop into an IPython session
-    # value = result.read()
-    # cos.loginfo('value.__class__')
-    # cos.loginfo(value.__class__)
-    # result.copy(self.hdf5_file.create_array(where, key, []))
     result.copy(eval('self.hdf5_file.root.%s' % where[1:]))
-    # self.hdf5_file.create_array(where, key, value)
-    # result._v_attrs._f_copy(eval('self.hdf5_file.root.%s.%s'%(where[1:],key)))
     self.hdf5_file.flush()
 
   def close(self):
