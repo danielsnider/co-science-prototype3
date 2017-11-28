@@ -16,8 +16,14 @@ nodes:
     - input files: '/home/dan/imglib2-tutorials/images/*.tiff'
 
 
+- name: viewer
+  file: viewer.py
+  package: builtin
+  inputs: 
+    - image: image
+  params:
+
 
 actions:
-
-  - image:
+  - viewer_trigger:
     - im0

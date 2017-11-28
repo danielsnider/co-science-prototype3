@@ -4,6 +4,7 @@ import cos
 
 class CacheService():
   def __init__(self, node_name, pkg_info, hdf5_path=None):
+    self.cache_enabled = True
     self.work_dir = '.'
     self.hdf5_path = hdf5_path or os.path.join(self.work_dir,'%s_cache.h5' % node_name)
     self.hdf5_file = tables.open_file(self.hdf5_path,'a') # TEST: does not overwrite existing?
@@ -30,19 +31,25 @@ class CacheService():
       return None
 
   def lookup(self, request):
-    return self.lookup_mem_hdf5(request) or \
-           self.lookup_disk_hdf5(request)
+    if self.cache_enabled:
+      return self.lookup_mem_hdf5(request) or \
+             self.lookup_disk_hdf5(request)
 
   def queue_cache_entry(self, request, result):
     pass
 
   def insert_cache_entry(self, request, result):
     where = '/%s' % self.group_name
-    key = request
-    value = result
-    cos.loginfo('value.__class__')
-    cos.loginfo(value.__class__)
-    self.hdf5_file.create_array(where, key, value)
+    # key = request
+    # from IPython import embed
+    # embed() # drop into an IPython session
+    # value = result.read()
+    # cos.loginfo('value.__class__')
+    # cos.loginfo(value.__class__)
+    # result.copy(self.hdf5_file.create_array(where, key, []))
+    result.copy(eval('self.hdf5_file.root.%s' % where[1:]))
+    # self.hdf5_file.create_array(where, key, value)
+    # result._v_attrs._f_copy(eval('self.hdf5_file.root.%s.%s'%(where[1:],key)))
     self.hdf5_file.flush()
 
   def close(self):

@@ -29,6 +29,7 @@ for filename in glob.iglob('../images/*'):
   filename_dict = r.groupdict()
   for key, value in filename_dict.iteritems():
     arr._f_setattr(key,value)
+  arr._f_setattr('filename',filename)
   
   cos.loginfo('loaded image %s to array_name "%s"' % (filename, array_name))
   i+=1
@@ -36,7 +37,7 @@ for filename in glob.iglob('../images/*'):
 def get_resource_callback(request):
   try:
     im = eval('h5file.root.%s' % request.selector)
-    return im.read()
+    return im
   except tables.exceptions.NoSuchNodeError as e:
     err_msg = 'Could not find image with id "%s"' % request.selector
     cos.logerr(err_msg)

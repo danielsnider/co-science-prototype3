@@ -48,9 +48,10 @@ def hdf5_response_to_im(response):
   h5file = tables.open_file("in-memory-sample.h5", driver="H5FD_CORE",
                                   driver_core_image=response.message.decode('base64'),
                                   driver_core_backing_store=0)
-  im = h5file.root.im.read()
-  h5file.close()
-  return im
+  # im = h5file.root.im.read()
+  # h5file.close()
+  # return im
+  return h5file.root.im
 
 def create_grpc_channel_at(input_url):
   grpc_options=[('grpc.max_send_message_length', -1),
@@ -125,19 +126,25 @@ class Node(HDF5_pb2_grpc.AssetServicer):
       raise e
 
   def GetAsset(self, request, context):
+    # If consumer, don't check cache, always return None
     if self.node_type == 'consumer':
       # Get data from input topic and do work without creating any result data
       im = self.GetDataFromInputTopic(request.selector)
       self.DoUserCallback(im)
       return HDF5_pb2.AssetReply(message='None')
+
+    # If cache hit, don't do callback
     data = self.cache.lookup(request.selector) # TODO: allow returning None as a valid cache hit result
     if data:
       h5single = tables.open_file("new_im.h5", "w", driver="H5FD_CORE",
                                 driver_core_backing_store=0)
       h5single.create_array(h5single.root, 'im', data.read())
+      data._v_attrs._f_copy(h5single.root.im)
       data = h5single.get_file_image().encode('base64')
       h5single.close()
       return HDF5_pb2.AssetReply(message=data)
+
+    # If cache miss
     if self.node_type == 'producer':
       # Access new data and return it to the requester
       im = self.DoUserCallback(request)
@@ -148,7 +155,11 @@ class Node(HDF5_pb2_grpc.AssetServicer):
     # return data to the requester
     h5single = tables.open_file("new_im.h5", "w", driver="H5FD_CORE",
                               driver_core_backing_store=0)
-    h5single.create_array(h5single.root, 'im', im)
+    if type(im).__name__ == 'ndarray':
+      h5single.create_array(h5single.root, 'im', im)
+    else: # PyTables node
+      h5single.create_array(h5single.root, 'im', im.read())
+      im._v_attrs._f_copy(h5single.root.im)
     data = h5single.get_file_image().encode('base64')
     h5single.close()
     self.cache.insert_cache_entry(request.selector, im)

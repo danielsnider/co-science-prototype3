@@ -11,10 +11,12 @@ def display_image(im):
   cos.loginfo('displaying image!')
   plt.clf()
   plt.imshow(im)
-  text=plt.text(im.shape[1]/2, im.shape[0]-100, 'some text', color='white',
-                          ha='center', va='center') # position bottom middle
-  text.set_path_effects([path_effects.Stroke(linewidth=3, foreground='black'),
-                       path_effects.Normal()])
+  if im._v_attrs.__contains__('filename'):
+    filename=im._v_attrs.filename
+    text=plt.text(im.shape[1]/2, im.shape[0]-100, filename, color='white',
+                            ha='center', va='center') # position bottom middle
+    text.set_path_effects([path_effects.Stroke(linewidth=3, foreground='black'),
+                         path_effects.Normal()])
   plt.show(block=False)
   plt.waitforbuttonpress()
   plt.close()
@@ -29,7 +31,7 @@ def display_image(im):
 
 if __name__ == '__main__':
   cos.init_node('viewer')
-  cos.consumer(In='image.segmentation.watershed', cb=display_image)
+  cos.consumer(In='image', cb=display_image)
   try:
     cos.spin()
   except KeyboardInterrupt:
