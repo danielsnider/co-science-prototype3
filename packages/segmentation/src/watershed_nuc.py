@@ -25,8 +25,7 @@ def segment_nuc(im):
   return watershedded
 
 if __name__ == '__main__':
-  cos.init_node('watershed')
-  cos.prosumer(In='image', out='image.segmentation.watershed', cb=segment_nuc)
+  cos.prosumer(name='watershed', In=['image.image'], out=['image.segmentation.watershed'], cb=segment_nuc)
   try:
     cos.spin()
   except KeyboardInterrupt:

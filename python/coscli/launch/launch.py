@@ -78,11 +78,13 @@ def _launch(launch_file,this_package,pkg_info):
   time.sleep(2) # TODO: Wait till everything has started and is ready
   actions = launch_config['actions'] if 'actions' in launch_config else []
   for action in actions:
-    cos.init_node('Cos Launch Action Executor')
-    topic = action.keys()[0]
-    for selector in action[topic]:
+    topic = action['topic']
+    for selector in action['select']:
       cos.loginfo('Requesting %s on topic %s' % (selector, topic))
-      im = cos.request(topic,selector)
+      selector_ids = selector['id']
+      if type(topic) != list: # one ore more topics can be specified in an launch file action (maybe useless), and if only one, it is not a list but cos.request expects one
+        topic = [topic]
+      data = cos.request(topic,selector_ids,node_name='COS Launch Action Executor')
   if actions:
     cos.loginfo('Finished executing actions.')
 

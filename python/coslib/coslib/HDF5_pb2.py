@@ -19,7 +19,7 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   name='HDF5.proto',
   package='asset',
   syntax='proto3',
-  serialized_pb=_b('\n\nHDF5.proto\x12\x05\x61sset\" \n\x0c\x41ssetRequest\x12\x10\n\x08selector\x18\x01 \x01(\t\"\x1d\n\nAssetReply\x12\x0f\n\x07message\x18\x01 \x01(\t2=\n\x05\x41sset\x12\x34\n\x08GetAsset\x12\x13.asset.AssetRequest\x1a\x11.asset.AssetReply\"\x00\x42,\n\x16io.grpc.examples.assetB\nAssetProtoP\x01\xa2\x02\x03HLWb\x06proto3')
+  serialized_pb=_b('\n\nHDF5.proto\x12\x05\x61sset\"0\n\x0c\x41ssetRequest\x12\x10\n\x08selector\x18\x01 \x01(\t\x12\x0e\n\x06\x66ields\x18\x02 \x01(\t\"\x1d\n\nAssetReply\x12\x0f\n\x07message\x18\x01 \x01(\t2=\n\x05\x41sset\x12\x34\n\x08GetAsset\x12\x13.asset.AssetRequest\x1a\x11.asset.AssetReply\"\x00\x42,\n\x16io.grpc.examples.assetB\nAssetProtoP\x01\xa2\x02\x03HLWb\x06proto3')
 )
 
 
@@ -39,6 +39,13 @@ _ASSETREQUEST = _descriptor.Descriptor(
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
+    _descriptor.FieldDescriptor(
+      name='fields', full_name='asset.AssetRequest.fields', index=1,
+      number=2, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=_b("").decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None),
   ],
   extensions=[
   ],
@@ -52,7 +59,7 @@ _ASSETREQUEST = _descriptor.Descriptor(
   oneofs=[
   ],
   serialized_start=21,
-  serialized_end=53,
+  serialized_end=69,
 )
 
 
@@ -82,8 +89,8 @@ _ASSETREPLY = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=55,
-  serialized_end=84,
+  serialized_start=71,
+  serialized_end=100,
 )
 
 DESCRIPTOR.message_types_by_name['AssetRequest'] = _ASSETREQUEST
@@ -114,8 +121,8 @@ _ASSET = _descriptor.ServiceDescriptor(
   file=DESCRIPTOR,
   index=0,
   options=None,
-  serialized_start=86,
-  serialized_end=147,
+  serialized_start=102,
+  serialized_end=163,
   methods=[
   _descriptor.MethodDescriptor(
     name='GetAsset',

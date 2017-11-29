@@ -44,6 +44,22 @@ nodes:
   outputs:
     - image.rgb_overlay
 
+nodes:
+- name: composite channels with boarders
+  file: composite_channels.py
+  package: builtin
+  inputs: 
+    - image.labelled
+    - channels:
+      - image.ch1
+      - image.ch2
+      - image.ch3
+  params:
+    - color_ch1: red
+      color_ch2: green
+      color_ch3: blue
+    
+
 - name: image quality
   file: image_quality.py
   package: builtin

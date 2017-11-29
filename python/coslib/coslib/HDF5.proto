@@ -14,6 +14,7 @@ service Asset {
 
 message AssetRequest {
   string selector = 1;
+  string fields = 2;
 }
 
 message AssetReply {

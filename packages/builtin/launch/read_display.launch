@@ -15,15 +15,23 @@ nodes:
   params: 
     - input files: '/home/dan/imglib2-tutorials/images/*.tiff'
 
+- name: segment_nuc
+  file: watershed_nuc.py
+  package: segmentation
+  input: 
+    - image
+  output:
+    - image.segmentation.watershed
 
 - name: viewer
   file: viewer.py
   package: builtin
   inputs: 
-    - image: image
+    - image.image
+    - image.filename
   params:
 
-
 actions:
-  - viewer_trigger:
-    - im0
+  - topic: viewer_trigger
+    select: 
+      - id: im0

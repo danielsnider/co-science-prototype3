@@ -24,7 +24,7 @@ for filename in glob.iglob('../images/*'):
 
   # Add metadata
   name = 'r02c02f06p01-ch3sk74fk1fl1.tif'
-  exp = re.compile('r(?P<row>\d+)c(?P<column>\d+)f(?P<field>\d+)p(?P<plate>\d+)-ch(?P<channal>\d+)sk(?P<time>\d+)')
+  exp = re.compile('r(?P<row>\d+)c(?P<column>\d+)f(?P<field>\d+)p(?P<plate>\d+)-ch(?P<channel>\d+)sk(?P<time>\d+)')
   r=exp.search(name)
   filename_dict = r.groupdict()
   for key, value in filename_dict.iteritems():
@@ -37,6 +37,7 @@ for filename in glob.iglob('../images/*'):
 def get_resource_callback(request):
   try:
     im = eval('h5file.root.%s' % request.selector)
+    # TODO: confirm that output data matches what is listed in the cos.producer(out=[]) list
     return im
   except tables.exceptions.NoSuchNodeError as e:
     err_msg = 'Could not find image with id "%s"' % request.selector
@@ -45,8 +46,19 @@ def get_resource_callback(request):
     raise Exception(err_msg)
 
 if __name__ == '__main__':
-  cos.init_node('reader')
-  cos.producer(out='image', cb=get_resource_callback)
+  cos.producer(
+    name='reader',
+    out=[
+      'image.image',
+      'image.row',
+      'image.column',
+      'image.field',
+      'image.plate',
+      'image.channel',
+      'image.time',
+      'image.filename'],
+    cb=get_resource_callback
+  )
   try:
     cos.spin()
   except KeyboardInterrupt:

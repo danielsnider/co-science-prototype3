@@ -222,5 +222,29 @@ up the web of nodes until it reaches the authorities on the request, whom start 
 the data according to the selector and subsequent nodes compute their results.
 
 
-1. use a big centralized database
 
+  # param1 = cos.get_param('/node_name/param1','default_value')
+
+
+# USAGE EXAMPLE
+# $ python viewer.py TOPIC IMG_ID
+# def request_image():
+#   topic = sys.argv[1]
+#   requested_image = sys.argv[2]
+#   im = cos.cos_request(topic, requested_image)
+#   display_image(im)
+
+
+Variable number of arguments notes:
+
+  # composite n number of channels
+def display_image(labelled, channels, categories):
+  cos.consumer(In=['image.labelled', {'channels':['image.ch1','image.ch2','image.ch3']}, 'image.cells.categories'], cb=display_image)
+  
+  # register n number of images
+  consumer = cos.consumer(
+    name='register_image',
+    In=['image.labelled', 'image.filename'],
+    group_by=['image.well','image.time'],
+    cb=display_image,
+  )
