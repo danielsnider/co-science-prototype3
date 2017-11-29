@@ -7,7 +7,7 @@ import matplotlib.patheffects as path_effects
 
 
 plt.ion()
-def display_image(image, filename):
+def display_image(image, filename=None):
   cos.loginfo('displaying image!')
   plt.clf()
   plt.imshow(image)

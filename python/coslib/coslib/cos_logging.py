@@ -2,10 +2,8 @@ import logging
 
 logger = logging.getLogger('cos')
 logger.setLevel(logging.DEBUG)
-# create file handler that logs debug and higher level messages
-# create console handler with a higher log level
-# create formatter and add it to the handlers
-formatter = logging.Formatter('[%(levelname)s][%(threadName)s][%(name)s/%(filename)s:%(lineno)s]: %(message)s')
+formatter = logging.Formatter('[%(levelname)s][%(name)s][%(filename)s:%(lineno)s]: %(message)s')
+# [%(threadName)s]
 
 def log_to_stdout():
   ch = logging.StreamHandler()

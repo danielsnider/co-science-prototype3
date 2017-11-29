@@ -93,11 +93,6 @@ def create_grpc_channels(input_urls):
   channel_stubs = {}
 
   for input_url in input_urls.keys():
-    # if input_url == 'localhost:50055':
-    # # print input_url
-    #   from IPython import embed
-    #   embed() # drop into an IPython session
-
     grpc_options=[('grpc.max_send_message_length', -1),
              ('grpc.max_receive_message_length', -1)]
     channel = grpc.insecure_channel(input_url,options=grpc_options)
@@ -123,7 +118,7 @@ def close():
 def request(topic, selector, fields=None, node_name=None):
   try:
     topic_url = topic_to_one_rpc_url(topic) # NOTE: multiple topics not yet supported
-    logdebug('requesting on topic %s' % topic_url)
+    logdebug('requesting on topic %s' % topic)
     channel_stub = create_grpc_channels(topic_url)[topic_url] # NOTE: multiple topics not yet supported
     response = channel_stub.GetAsset(HDF5_pb2.AssetRequest(selector=selector, fields=fields))
     if response.message in ['CosNone', 'CosError']:
@@ -253,7 +248,7 @@ class Node(HDF5_pb2_grpc.AssetServicer):
       logerr('Unable to assign address: %s' % self.output_url)
       time.sleep(2)
     self.grpc_server.start()
-    logdebug('output topic ready: %s' % self.output_topic)
+    logdebug('output fields ready: %s' % self.output_topic)
     try:
       while True:
         time.sleep(_ONE_DAY_IN_SECONDS)
