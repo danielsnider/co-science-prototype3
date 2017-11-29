@@ -203,10 +203,9 @@ class Node(HDF5_pb2_grpc.AssetServicer):
       data_out._v_attrs._f_copy(h5single.root.im) # copy attributes
     # fields = message.fields  # TODO: only respond with the fields requested
     data_out_b64 = h5single.get_file_image().encode('base64')
+    self.cache.insert_cache_entry(request.selector, h5single.root.im)
     h5single.close()
-    self.cache.insert_cache_entry(request.selector, data_out)
     return HDF5_pb2.AssetReply(message=data_out_b64)
-
 
   def GetDataFromInputTopics(self, selector):
     # Do GRPC calls to get data from other nodes
