@@ -67,28 +67,27 @@ def topic_to_one_rpc_url(output_topic):
     raise Exception(msg)
   return output_url.keys()[0] # return url as a string
 
-def hdf5_response_to_data_in(response, fields):
-  h5file = tables.open_file("in-memory-sample.h5", driver="H5FD_CORE",
-                                  driver_core_image=response.message.decode('base64'),
-                                  driver_core_backing_store=0)
-  data_in = []
-  for field in fields:
-    field_name = field.split('image.')[1]
-    if field_name in ['image', 'segmentation.watershed']:  # get array type fields
-      data_in_part = h5file.root.im.read()
-    else:
-      data_in_part = h5file.root.im._v_attrs[field_name]
-    data_in.append(data_in_part)
+# def hdf5_response_to_data_in(response, fields):
+#   h5file = tables.open_file("in-memory-sample.h5", driver="H5FD_CORE",
+#                                   driver_core_image=response.message.decode('base64'),
+#                                   driver_core_backing_store=0)
+#   data_in = []
+#   for field in fields:
+#     field_name = field.split('image.')[1]
+#     if field_name in ['image', 'segmentation.watershed']:  # get array type fields
+#       data_in_part = h5file.root.im.read()
+#     else:
+#       data_in_part = h5file.root.im._v_attrs[field_name]
+#     data_in.append(data_in_part)
 
-  h5file.close()
-  return data_in
+#   h5file.close()
+#   return data_in
 
 def get_field_from_hdf5(h5file, field):
-  field_name = field.split('image.')[1]
-  if field_name in ['image', 'segmentation.watershed']:  # get array type fields
-    data_in_part = h5file.root.im.read()
+  if field in ['image.image', 'image.segmentation.watershed']:  # get array type fields
+    data_in_part = h5file.get_node('/', field).read()
   else:
-    data_in_part = h5file.root.im._v_attrs[field_name]
+    data_in_part = h5file.root._v_attrs[field]
   return data_in_part
 
 def create_grpc_channels(input_urls):
@@ -121,16 +120,16 @@ def close():
 ###
 ### REQUEST
 ###
-def request(topic, selector, fields=None, node_name=None):
+def request(topic, selector, fields=[], node_name=None):
   try:
     topic_url = topic_to_one_rpc_url(topic) # NOTE: multiple topics not yet supported
     logdebug('requesting on topic %s' % topic)
     channel_stub = create_grpc_channels(topic_url)[topic_url] # NOTE: multiple topics not yet supported
-    response = channel_stub.GetAsset(HDF5_pb2.AssetRequest(selector=selector, fields=fields))
+    response = channel_stub.GetAsset(HDF5_pb2.AssetRequest(selector=[selector], fields=fields))
     if response.message in ['CosNone', 'CosError']:
       return
-    data_in = hdf5_response_to_data_in(response)
-    return data_in
+    # data_in = hdf5_response_to_data_in(response)
+    return response
   except grpc._channel._Rendezvous as e:
     err_msg = e._state.details.split('Exception calling application: ')[-1]
     logerr('Error in node: %s. Message: "%s"' % (node_name,err_msg))
@@ -157,8 +156,8 @@ class Node(HDF5_pb2_grpc.AssetServicer):
         self.input_topics = params['input_topic']
         self.input_urls = topic_to_rpc_url(self.input_topics)
         self.InputGetters = create_grpc_channels(self.input_urls)
-      self.output_topic = params['output_topic']
-      self.output_url = topic_to_one_rpc_url(self.output_topic)
+      self.output_topics = params['output_topic']
+      self.output_url = topic_to_one_rpc_url(self.output_topics)
       self.num_workers = params['num_workers']
       self.grpc_server = grpc.server(futures.ThreadPoolExecutor(max_workers=self.num_workers))
       pkg_info  = {'src_sha': 'eontue9u409'} # TODO: Get from param server?
@@ -167,7 +166,7 @@ class Node(HDF5_pb2_grpc.AssetServicer):
     except Exception as e:
       logerr('Error in __init__ of this node: %s' % self.node_name)
       self.stop()
-      raise e
+      raise
 
   def GetAsset(self, request, context):
     try:
@@ -175,22 +174,16 @@ class Node(HDF5_pb2_grpc.AssetServicer):
       if self.node_type == 'consumer':
         # Get data from input topic and do work without creating any result data
         data_in = self.GetDataFromInputTopics(request.selector)
+
         if not data_in:
           return HDF5_pb2.AssetReply(message='CosError')
         self.UserCallback(*data_in)
         return HDF5_pb2.AssetReply(message='CosNone')
 
       # If pro* and cache hit, don't do callback
-      cached_data = self.output_cache.lookup(request.selector) # TODO: allow returning None as a valid cache hit result
+      cached_data = self.output_cache.lookup(request.selector[0]) # TODO: allow returning None as a valid cache hit result
       if cached_data:
-        # create new hdf5 and keep only what we need to drop parent information and other possible stuff
-        h5single = tables.open_file("new_im.h5", "w", driver="H5FD_CORE",
-                                  driver_core_backing_store=0)
-        h5single.create_array(h5single.root, 'im', cached_data.read())
-        cached_data._v_attrs._f_copy(h5single.root.im) # copy attributes
-        data_out_b64 = h5single.get_file_image().encode('base64')
-        h5single.close()
-        return HDF5_pb2.AssetReply(message=data_out_b64)
+        return HDF5_pb2.AssetReply(message=cached_data)
 
       # If cache miss
       if self.node_type == 'producer':
@@ -201,22 +194,25 @@ class Node(HDF5_pb2_grpc.AssetServicer):
         data_in = self.GetDataFromInputTopics(request.selector)
         data_out = self.UserCallback(*data_in)
 
-      # return data to the requester
+      # Make data_out a tuple. UserCallbacks can return on value or more than one inwhich case it's a tuple.
+      if data_out.__class__ != tuple:
+        data_out = (data_out,)
+
+      # Convert data_out to a HDF5
       h5single = tables.open_file("new_im.h5", "w", driver="H5FD_CORE",
                                 driver_core_backing_store=0)
-      if type(data_out).__name__ == 'ndarray': # TODO: fix this
-        h5single.create_array(h5single.root, 'im', data_out)
-      else: # PyTables node
-      # try:
-      # except:
-      #   from IPython import embed
-      #   embed() # drop into an IPython session
-        h5single.create_array(h5single.root, 'im', data_out.read())
-        data_out._v_attrs._f_copy(h5single.root.im) # copy attributes
-      # fields = message.fields  # TODO: only respond with the fields requested
+      for idx, output_topic in enumerate(self.output_topics):
+        data_value = data_out[idx]
+        data_class = str(data_value.__class__)
+        if data_class == "<type 'numpy.ndarray'>":
+          h5single.create_array(h5single.root, output_topic, data_value)
+        else:
+          h5single.root._f_setattr(output_topic,data_value)
+
+      # Return data to the requester
       data_out_b64 = h5single.get_file_image().encode('base64')
-      self.output_cache.insert_cache_entry(request.selector, h5single.root.im)
       h5single.close()
+      self.output_cache.insert_cache_entry(request.selector[0], data_out_b64)
       return HDF5_pb2.AssetReply(message=data_out_b64)
     except Exception:
       logerr('GetAsset() Error in this node: %s' % self.node_name)
@@ -224,7 +220,8 @@ class Node(HDF5_pb2_grpc.AssetServicer):
 
   def GetDataFromInputTopics(self, selector):
     # Do GRPC calls to get data from other nodes
-    grpc_request = HDF5_pb2.AssetRequest(selector=selector, fields=str(self.input_topics))
+    selector =  [item for item in selector] # convert list of type RepeatedScalarContainer to python list
+    grpc_request = HDF5_pb2.AssetRequest(selector=selector, fields=self.input_topics)
     hdf5_responses = {}
     for input_url in self.input_urls.keys():
       try:
@@ -248,7 +245,14 @@ class Node(HDF5_pb2_grpc.AssetServicer):
       url = field_to_url(self.input_urls, field)
       h5file = hdf5_responses[url]
       one_field_from_one_node = get_field_from_hdf5(h5file, field)
-      data_in.append(one_field_from_one_node)
+      if not data_in:
+        # NOTE(Dan): This is a bug fix. The problem is when appending a numpy.array
+        # to an empty list. The result is only one row from the numpy.array gets
+        # into the list. The workaround is to do 'list = [np.array]' instead of 
+        # appending to an empty list
+        data_in = [one_field_from_one_node]
+      else:
+        data_in.append(one_field_from_one_node)
 
     # Cleanup HDF5 files
     for h5file in hdf5_responses.keys():
@@ -262,7 +266,7 @@ class Node(HDF5_pb2_grpc.AssetServicer):
       logerr('Unable to assign address: %s' % self.output_url)
       time.sleep(2)
     self.grpc_server.start()
-    logdebug('output fields ready: %s' % self.output_topic)
+    logdebug('output fields ready: %s' % self.output_topics)
     try:
       while True:
         time.sleep(_ONE_DAY_IN_SECONDS)

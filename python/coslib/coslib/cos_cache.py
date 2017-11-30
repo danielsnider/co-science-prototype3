@@ -13,17 +13,14 @@ class CacheService():
     try:
       self.group = self.hdf5_file.create_group('/', self.group_name, 'Cache')
     except tables.exceptions.NodeError:
-      pass
-
-  def lookup_mem_hdf5(self, request):
-    # NOT IMPLEMENTED
-    # Does pytables cache recently used in memory?
-    return False
+      pass # Group already created :-)
 
   def lookup_disk_hdf5(self, request):
     h5_node_name = '/%s/%s' % (self.group_name, request)
+
     try:
       node = self.hdf5_file.get_node(h5_node_name)
+      node = node.read()
 
       cos.logdebug("[CACHE] hit for request %s at node %s" % (request, self.node_name))
       return node
@@ -34,15 +31,15 @@ class CacheService():
 
   def lookup(self, request):
     if self.cache_enabled:
-      return self.lookup_mem_hdf5(request) or \
-             self.lookup_disk_hdf5(request)
-
-  def queue_cache_entry(self, request, result):
-    pass
+      return self.lookup_disk_hdf5(request)
 
   def insert_cache_entry(self, request, result):
-    # cos.logdebug("[CACHE] insert for request %s at node %s" % (request, self.node_name))
-    result.copy(eval('self.hdf5_file.root.%s' % self.group_name),newname=request,overwrite=True)
+    group = '/%s' % self.group_name
+    try:
+      self.hdf5_file.create_array(group,request,result)
+    except tables.exceptions.NodeError as e:
+      if not 'already has a child node named' in e.message:
+        raise  # unknown error
     self.hdf5_file.flush()
 
   def close(self):

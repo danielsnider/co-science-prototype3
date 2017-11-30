@@ -30,7 +30,7 @@ def segment_nuc(im):
 
 if __name__ == '__main__':
   # cos.prosumer(name='watershed', In=['image.image'], out=['image.segmentation.watershed'], cb=segment_nuc)
-  cos.prosumer(name='watershed', In=['image.image'], out=['image.segmentation.watershed', 'cell.id'], cb=segment_nuc)
+  cos.prosumer(name='watershed', In=['image.image'], out=['image.segmentation.watershed'], cb=segment_nuc)
   try:
     cos.spin()
   except KeyboardInterrupt:

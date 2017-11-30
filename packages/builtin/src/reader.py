@@ -36,9 +36,17 @@ for filename in glob.iglob('../images/*'):
 
 def get_resource_callback(request):
   try:
-    im = eval('h5file.root.%s' % request.selector)
-    # TODO: confirm that output data matches what is listed in the cos.producer(out=[]) list
-    return im
+    H5_node = eval('h5file.root.%s' % request.selector[0])
+    image = H5_node.read()
+    row = H5_node._v_attrs['row']
+    column = H5_node._v_attrs['column']
+    field = H5_node._v_attrs['field']
+    plate = H5_node._v_attrs['plate']
+    channel = H5_node._v_attrs['channel']
+    time = H5_node._v_attrs['time']
+    filename = H5_node._v_attrs['filename']
+    return image, row, column, field, plate, channel, time, filename
+
   except tables.exceptions.NoSuchNodeError as e:
     err_msg = 'Could not find image with id "%s"' % request.selector
     cos.logerr(err_msg)

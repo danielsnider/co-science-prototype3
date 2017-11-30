@@ -13,8 +13,8 @@ service Asset {
 }
 
 message AssetRequest {
-  string selector = 1;
-  string fields = 2;
+  repeated string selector = 1;
+  repeated string fields = 2;
 }
 
 message AssetReply {
