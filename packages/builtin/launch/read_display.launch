@@ -35,3 +35,15 @@ actions:
   - topic: viewer_trigger
     select: 
       - id: im0
+    # - row: <3
+      # sort-ascending: row
+      # row: start:10:end
+      # row: first
+      # row: last
+      # filename: like ['../images/r02c02f06p01-ch3sk74fk1fl1.tif', 'mouse']
+      # row: one_each
+      # limit: 2
+      # row: not 5
+      # row: python $val+1==3
+      # row: <percentile(50)
+

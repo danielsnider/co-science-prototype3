@@ -41,10 +41,6 @@ class CacheService():
     pass
 
   def insert_cache_entry(self, request, result):
-    # h5_node_name = '/%s/%s' % (self.group_name, request)
-    # from IPython import embed
-    # embed() # drop into an IPython session
-
     result.copy(eval('self.hdf5_file.root.%s' % self.group_name),newname=request,overwrite=True)
     self.hdf5_file.flush()
 
