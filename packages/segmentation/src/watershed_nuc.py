@@ -8,7 +8,7 @@ from coslib.coslib import cos
 def segment_nuc(im):
   T = mh.thresholding.otsu(im) # calculate a threshold value
 
-  # apply a gaussian filter that smoothen the image
+  # Apply a gaussian filter to smooth the image
   smoothed = mh.gaussian_filter(im, 8)
   thresholded= smoothed > T # do threshold
 
@@ -22,10 +22,15 @@ def segment_nuc(im):
   # Remove areas that aren't nuclei
   watershedded[np.logical_not(thresholded)] = 0
 
+
+  cell_id = ['abc', 'def', 'ghi']
+  # cell_centroid = [(1,2),(3,4)]
+  # return watershedded, cell_id
   return watershedded
 
 if __name__ == '__main__':
-  cos.prosumer(name='watershed', In=['image.image'], out=['image.segmentation.watershed'], cb=segment_nuc)
+  # cos.prosumer(name='watershed', In=['image.image'], out=['image.segmentation.watershed'], cb=segment_nuc)
+  cos.prosumer(name='watershed', In=['image.image'], out=['image.segmentation.watershed', 'cell.id'], cb=segment_nuc)
   try:
     cos.spin()
   except KeyboardInterrupt:

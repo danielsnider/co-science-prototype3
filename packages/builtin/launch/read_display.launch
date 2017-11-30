@@ -4,14 +4,13 @@ nodes:
   file: reader.py
   package: builtin
   outputs: 
-    - to: image
-      fields:
-        - image
-        - filename
-        - row
-        - column
-        - field
-        - plate
+    - image.id
+    - image.image
+    - image.filename
+    - image.row
+    - image.column
+    - image.field
+    - image.plate
   params: 
     - input files: '/home/dan/imglib2-tutorials/images/*.tiff'
 
@@ -19,15 +18,17 @@ nodes:
   file: watershed_nuc.py
   package: segmentation
   input: 
-    - image
+    - image.image
   output:
     - image.segmentation.watershed
+    - cell.id
+    # - cell.cell_centroid
 
 - name: viewer
   file: viewer.py
   package: builtin
   inputs: 
-    - image.image
+    - image.segmentation.watershed
     - image.filename
   params:
 

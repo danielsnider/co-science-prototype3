@@ -28,19 +28,25 @@ def topic_to_rpc_url(topics):
 
   mapping = {
     # 'image': '127.0.0.1:0', # AUTO-SET PORT NUMBER
-    'image.image': 'localhost:50051',
     'image.row': 'localhost:50051',
     'image.column': 'localhost:50051',
     'image.field': 'localhost:50051',
     'image.plate': 'localhost:50051',
     'image.channel': 'localhost:50051',
     'image.time': 'localhost:50051',
+    # 'gaus': 'localhost:50052',
+    # 'image.filter.laplace': 'localhost:50053',
+    # 'image.filter.gaussian': 'localhost:50052',
+    'cc.image.image': 'localhost:50050',
+    'cc.image.filename': 'localhost:50050',
+    'image.image': 'localhost:50051',
     'image.filename': 'localhost:50051',
-    'image.filter.gaussian': 'localhost:50052',
-    'gaus': 'localhost:50052',
-    'image.filter.laplace': 'localhost:50053',
+    'cc.image.segmentation.watershed': 'localhost:50054',
     'image.segmentation.watershed': 'localhost:50055',
-    'viewer_trigger': 'localhost:50054'
+    'viewer_trigger': 'localhost:50056',
+    'cell.id': 'localhost:50055',
+    'cell.x': 'localhost:50055',
+    'cell.y': 'localhost:50055'
   }
 
   results = {}
@@ -145,7 +151,7 @@ class Node(HDF5_pb2_grpc.AssetServicer):
       topics.append(self)
       self.node_name = params['node_name']
       logger.name = self.node_name
-      self.DoUserCallback = callback
+      self.UserCallback = callback
       self.node_type = params['node_type']
       if not self.node_type == 'producer': # Producers have no input topic
         self.input_topics = params['input_topic']
@@ -156,56 +162,65 @@ class Node(HDF5_pb2_grpc.AssetServicer):
       self.num_workers = params['num_workers']
       self.grpc_server = grpc.server(futures.ThreadPoolExecutor(max_workers=self.num_workers))
       pkg_info  = {'src_sha': 'eontue9u409'} # TODO: Get from param server?
-      self.cache = cos_cache.CacheService(self.node_name, pkg_info)
+      self.output_cache = cos_cache.CacheService(self.node_name, pkg_info)
       self.start()
-    except Exception:
-      logerr('Error in node: %s' % self.node_name)
+    except Exception as e:
+      logerr('Error in __init__ of this node: %s' % self.node_name)
       self.stop()
-      raise
+      raise e
 
   def GetAsset(self, request, context):
-    # If consumer, don't check cache, always return None
-    if self.node_type == 'consumer':
-      # Get data from input topic and do work without creating any result data
-      data_in = self.GetDataFromInputTopics(request.selector)
-      if not data_in:
-        return HDF5_pb2.AssetReply(message='CosError')
-      self.DoUserCallback(*data_in)
-      return HDF5_pb2.AssetReply(message='CosNone')
+    try:
+      # If consumer, don't check cache, always return None
+      if self.node_type == 'consumer':
+        # Get data from input topic and do work without creating any result data
+        data_in = self.GetDataFromInputTopics(request.selector)
+        if not data_in:
+          return HDF5_pb2.AssetReply(message='CosError')
+        self.UserCallback(*data_in)
+        return HDF5_pb2.AssetReply(message='CosNone')
 
-    # If pro* and cache hit, don't do callback
-    cached_data = self.cache.lookup(request.selector) # TODO: allow returning None as a valid cache hit result
-    if cached_data:
-      # create new hdf5 and keep only what we need to drop parent information and other possible stuff
+      # If pro* and cache hit, don't do callback
+      cached_data = self.output_cache.lookup(request.selector) # TODO: allow returning None as a valid cache hit result
+      if cached_data:
+        # create new hdf5 and keep only what we need to drop parent information and other possible stuff
+        h5single = tables.open_file("new_im.h5", "w", driver="H5FD_CORE",
+                                  driver_core_backing_store=0)
+        h5single.create_array(h5single.root, 'im', cached_data.read())
+        cached_data._v_attrs._f_copy(h5single.root.im) # copy attributes
+        data_out_b64 = h5single.get_file_image().encode('base64')
+        h5single.close()
+        return HDF5_pb2.AssetReply(message=data_out_b64)
+
+      # If cache miss
+      if self.node_type == 'producer':
+        # Access new data and return it to the requester
+        data_out = self.UserCallback(request)
+      if self.node_type == 'prosumer':
+        # Access data from another node, manipulate it, and return it to the requester
+        data_in = self.GetDataFromInputTopics(request.selector)
+        data_out = self.UserCallback(*data_in)
+
+      # return data to the requester
       h5single = tables.open_file("new_im.h5", "w", driver="H5FD_CORE",
                                 driver_core_backing_store=0)
-      h5single.create_array(h5single.root, 'im', cached_data.read())
-      cached_data._v_attrs._f_copy(h5single.root.im) # copy attributes
+      if type(data_out).__name__ == 'ndarray': # TODO: fix this
+        h5single.create_array(h5single.root, 'im', data_out)
+      else: # PyTables node
+      # try:
+      # except:
+      #   from IPython import embed
+      #   embed() # drop into an IPython session
+        h5single.create_array(h5single.root, 'im', data_out.read())
+        data_out._v_attrs._f_copy(h5single.root.im) # copy attributes
+      # fields = message.fields  # TODO: only respond with the fields requested
       data_out_b64 = h5single.get_file_image().encode('base64')
+      self.output_cache.insert_cache_entry(request.selector, h5single.root.im)
       h5single.close()
       return HDF5_pb2.AssetReply(message=data_out_b64)
-
-    # If cache miss
-    if self.node_type == 'producer':
-      # Access new data and return it to the requester
-      data_out = self.DoUserCallback(request)
-    if self.node_type == 'prosumer':
-      # Access data from another node, manipulate it, and return it to the requester
-      data_in = self.GetDataFromInputTopics(request.selector)
-      data_out = self.DoUserCallback(*data_in)
-    # return data to the requester
-    h5single = tables.open_file("new_im.h5", "w", driver="H5FD_CORE",
-                              driver_core_backing_store=0)
-    if type(data_out).__name__ == 'ndarray': # TODO: fix this
-      h5single.create_array(h5single.root, 'im', data_out)
-    else: # PyTables node
-      h5single.create_array(h5single.root, 'im', data_out.read())
-      data_out._v_attrs._f_copy(h5single.root.im) # copy attributes
-    # fields = message.fields  # TODO: only respond with the fields requested
-    data_out_b64 = h5single.get_file_image().encode('base64')
-    self.cache.insert_cache_entry(request.selector, h5single.root.im)
-    h5single.close()
-    return HDF5_pb2.AssetReply(message=data_out_b64)
+    except Exception:
+      logerr('GetAsset() Error in this node: %s' % self.node_name)
+      raise
 
   def GetDataFromInputTopics(self, selector):
     # Do GRPC calls to get data from other nodes
@@ -221,7 +236,7 @@ class Node(HDF5_pb2_grpc.AssetServicer):
       except grpc._channel._Rendezvous as e:
         in_fields = self.input_urls[input_url]
         err_msg = e._state.details.split('Exception calling application: ')[-1]
-        logerr('Error in node: %s. Message: "%s"' % (self.node_name,err_msg))
+        logerr('GetDataFromInputTopics() Error received by this node "%s" from remote node "%s". Message: "%s"' % (self.node_name, input_url,err_msg))
         if err_msg == 'Connect Failed':
           logerr("Trying to reach the data fields '%s'. Is the rode running? Is it reachable on its assigned address of '%s'?" % (in_fields, input_url))
         # raise e   # Don't raise a stacktrace here, it wasn't us, it was the other node
@@ -256,7 +271,7 @@ class Node(HDF5_pb2_grpc.AssetServicer):
 
   def stop(self):
     if hasattr(self, 'cache'):
-      self.cache.close()
+      self.output_cache.close()
     if hasattr(self, 'grpc_server'):
       self.grpc_server.stop(0) # This exits the process immediately and so must be last
 
@@ -316,9 +331,5 @@ def prosumer(name=None, In=None, out=None, cb=None):
 def start_node_thread(params, cb):
   thread = Thread(target=Node, args=(params, cb))
   thread.daemon = True # So that it stops when the parent is stopped
-  try:
-    thread.start()
-  except KeyboardInterrupt:
-    cos.logdebug('sart() STOP pass')
-    pass
+  thread.start()
 
